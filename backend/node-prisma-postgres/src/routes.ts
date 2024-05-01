@@ -1,5 +1,5 @@
 import express from "express";
-import { getUsers, signupUser } from "./controllers/userController";
+import { getUser, signupUser } from "./controllers/userController";
 import {
   createPerson,
   getPeople,
@@ -10,13 +10,13 @@ import { getEvents } from "./controllers/eventController";
 const routes = express.Router();
 
 //User routes
-routes.get("/users", getUsers);
 routes.post("/user", signupUser);
+routes.get("/user", getUser);
 
 //Person routes
 routes.post("/person", createPerson);
 routes.get("/people", getPeople);
-routes.get("/person/:id", getPersonDetails);
+routes.get("/person/:personId", getPersonDetails);
 
 //Event routes
 routes.get("/events", getEvents);

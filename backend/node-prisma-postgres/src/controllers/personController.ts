@@ -8,13 +8,24 @@ import {
   CreatePersonSchema,
   GetPersonDetailsSchema,
 } from "../models/personModels";
+import { ErrorStatusCodes, GlobalError } from "../middleware/errorMiddleware";
 
 export const createPerson: RequestHandler = async (req, res, next) => {
   try {
-    const { name, nickName, dob, userId, email, phone, events, notes } =
-      CreatePersonSchema.parse(req.body);
+    const {
+      firstName,
+      lastName,
+      nickName,
+      dob,
+      userId,
+      email,
+      phone,
+      events,
+      notes,
+    } = CreatePersonSchema.parse(req.body);
     const personId = await createPersonService({
-      name,
+      firstName,
+      lastName,
       nickName,
       phone,
       dob,
@@ -38,7 +49,13 @@ export const getPersonDetails: RequestHandler = async (req, res, next) => {
   try {
     const { personId } = GetPersonDetailsSchema.parse(req.params);
     const person = await getPersonDetailsService({ personId });
-    res.json({ person });
+    if (!person) {
+      throw new GlobalError(
+        "No people added with that person id",
+        ErrorStatusCodes.NOT_FOUND
+      );
+    }
+    res.json(person);
   } catch (error) {
     next(error);
   }

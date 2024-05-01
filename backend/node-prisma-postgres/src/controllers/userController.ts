@@ -1,12 +1,6 @@
-import { NextFunction, Request, Response } from "express";
-import { prismaClient } from "../app";
-import { SignupUserSchema } from "../models/userModels";
-import { signupUserService } from "../services/userService";
-
-export const getUsers = async (req: Request, res: Response) => {
-  const users = await prismaClient.user.findMany();
-  return res.json(users);
-};
+import { NextFunction, Request, RequestHandler, Response } from "express";
+import { GetUserSchema, SignupUserSchema } from "../models/userModels";
+import { getUserService, signupUserService } from "../services/userService";
 
 export const signupUser = async (
   req: Request,
@@ -25,6 +19,16 @@ export const signupUser = async (
     });
     return res.json({ id: userId });
   } catch (error: unknown) {
+    next(error);
+  }
+};
+
+export const getUser: RequestHandler = async (req, res, next) => {
+  try {
+    const { email } = GetUserSchema.parse(req.query);
+    const user = await getUserService({ email });
+    return res.json(user);
+  } catch (error) {
     next(error);
   }
 };

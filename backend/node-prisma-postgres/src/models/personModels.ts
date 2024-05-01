@@ -2,7 +2,8 @@ import { z } from "zod";
 import { CreateEventSchema } from "./eventModels";
 
 export const CreatePersonSchema = z.object({
-  name: z.string(),
+  firstName: z.string(),
+  lastName: z.string(),
   nickName: z.string(),
   email: z.string().email(),
   phone: z.string(),

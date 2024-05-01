@@ -6,7 +6,8 @@ import {
 import { prismaClient } from "../app";
 
 export const createPersonService = async ({
-  name,
+  firstName,
+  lastName,
   nickName,
   phone,
   dob,
@@ -17,7 +18,8 @@ export const createPersonService = async ({
 }: z.infer<typeof CreatePersonSchema>) => {
   const { id } = await prismaClient.person.create({
     data: {
-      name,
+      firstName,
+      lastName,
       nickName,
       dob,
       phone,
@@ -32,7 +34,7 @@ export const createPersonService = async ({
         create: [
           {
             eventDate: dob,
-            eventDescription: "Call him?",
+            eventDescription: "Go out for dinner",
             eventName: "Birthday",
             isRecurring: true,
           },
@@ -48,7 +50,8 @@ export const getPeopleService = async () => {
   const people = await prismaClient.person.findMany({
     select: {
       id: true,
-      name: true,
+      firstName: true,
+      lastName: true,
       nickName: true,
       dob: true,
       events: {

@@ -6,3 +6,7 @@ export const SignupUserSchema = z.object({
   email: z.string().email(),
   phone: z.string().length(10),
 });
+
+export const GetUserSchema = z.object({
+  email: z.string().email(),
+});

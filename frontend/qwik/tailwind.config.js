@@ -2,6 +2,9 @@
 export default {
   content: ["./src/**/*.{js,ts,jsx,tsx,mdx}"],
   theme: {
+    fontFamily: {
+      inter: "Inter",
+    },
     extend: {
       colors: {
         "havelock-blue": {

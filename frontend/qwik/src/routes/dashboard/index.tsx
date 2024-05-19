@@ -1,16 +1,22 @@
 import { component$ } from "@builder.io/qwik";
 import { routeLoader$ } from "@builder.io/qwik-city";
-import { z } from "zod";
+import { z } from "@builder.io/qwik-city";
 import { ProfileBox } from "~/components/profile/profile-box";
-import { type BaseResponseModel, UserProfileModel } from "~/data/models";
+import { type BaseResponseSchema, UserProfileSchema } from "~/data/models";
+import { ENV } from "~/lib/constants";
 
 export const useUser = routeLoader$<
-  BaseResponseModel<z.infer<typeof UserProfileModel>>
+  BaseResponseSchema<z.infer<typeof UserProfileSchema>>
 >(async (requestEvent) => {
-  const res = await fetch("http://localhost:3000/user?email=test@test.com", {
+  const res = await fetch(`${ENV.PUBLIC_API_URL}/user`, {
     method: "GET",
+    headers: requestEvent.request.headers,
+    credentials: "include",
   });
   if (!res.ok) {
+    if (res.status === 401) {
+      throw requestEvent.redirect(302, "/");
+    }
     return requestEvent.fail(res.status, {
       data: null,
       errorCode: res.status,
@@ -19,10 +25,9 @@ export const useUser = routeLoader$<
         "Could not fetch user, please refresh the page / try again later",
     });
   }
-  const user = await res.json();
-  console.log("🚀 ~ > ~ user:", user)
+  const { data } = await res.json();
   try {
-    UserProfileModel.parse(user);
+    UserProfileSchema.parse(data.user);
   } catch (err) {
     if (err instanceof z.ZodError) {
       return requestEvent.fail(409, {
@@ -33,7 +38,7 @@ export const useUser = routeLoader$<
       });
     }
   }
-  return { errorMessage: "", errorCode: 0, success: true, data: user };
+  return { errorMessage: "", errorCode: 0, success: true, data: data.user };
 });
 
 export default component$(() => {

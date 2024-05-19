@@ -1,50 +1,37 @@
 import { Slot, component$ } from "@builder.io/qwik";
-import { routeLoader$ } from "@builder.io/qwik-city";
-import { z } from "zod";
-import { EventCard } from "~/components/cards/event-card";
-import { PersonCard } from "~/components/cards/person-card";
 import {
-  type BaseResponseModel,
-  PeopleModel,
-  EventsModel,
-} from "~/data/models";
+  type RequestHandler,
+  routeLoader$,
+  useLocation,
+} from "@builder.io/qwik-city";
+import { z } from "@builder.io/qwik-city";
+import { BsPlusSquareFill } from "@qwikest/icons/bootstrap";
 
-export const usePeople = routeLoader$<
-  BaseResponseModel<z.infer<typeof PeopleModel>>
->(async (requestEvent) => {
-  const res = await fetch("http://localhost:3000/people", {
+import { Calendar } from "~/components/calendar/calendar";
+import { EventCard } from "~/components/cards/event-card";
+import { SSRLink } from "~/components/ssr-link/ssr-link";
+import { type BaseResponseSchema, UpcomingEventsSchema } from "~/data/models";
+import { ENV } from "~/lib/constants";
+import { cn } from "~/lib/utils";
+
+export const onGet: RequestHandler = async ({ request, redirect }) => {
+  const res = await fetch(`${ENV.PUBLIC_API_URL}/auth`, {
     method: "GET",
+    headers: request.headers,
   });
   if (!res.ok) {
-    return requestEvent.fail(res.status, {
-      data: [],
-      errorCode: res.status,
-      success: false,
-      errorMessage:
-        "Could not fetch people, please refresh the page / try again later",
-    });
-  }
-  const people = await res.json();
-  try {
-    PeopleModel.parse(people);
-  } catch (err) {
-    if (err instanceof z.ZodError) {
-      return requestEvent.fail(409, {
-        data: [],
-        errorCode: res.status,
-        success: false,
-        errorMessage: err.message,
-      });
+    if (res.status === 401) {
+      throw redirect(302, "/");
     }
   }
-  return { errorMessage: "", errorCode: 0, success: true, data: people };
-});
+};
 
 export const useEvents = routeLoader$<
-  BaseResponseModel<z.infer<typeof EventsModel>>
+  BaseResponseSchema<z.infer<typeof UpcomingEventsSchema>>
 >(async (requestEvent) => {
-  const res = await fetch("http://localhost:3000/events", {
+  const res = await fetch(`${ENV.PUBLIC_API_URL}/events`, {
     method: "GET",
+    headers: requestEvent.request.headers,
   });
   if (!res.ok) {
     return requestEvent.fail(res.status, {
@@ -55,9 +42,9 @@ export const useEvents = routeLoader$<
         "Could not fetch events, please refresh the page / try again later",
     });
   }
-  const events = await res.json();
+  const { data } = await res.json();
   try {
-    EventsModel.parse(events);
+    UpcomingEventsSchema.parse(data.events);
   } catch (err) {
     if (err instanceof z.ZodError) {
       return requestEvent.fail(409, {
@@ -68,47 +55,48 @@ export const useEvents = routeLoader$<
       });
     }
   }
-  return { errorMessage: "", errorCode: 0, success: true, data: events };
+  return { errorMessage: "", errorCode: 0, success: true, data: data.events };
 });
 
 export default component$(() => {
-  const people = usePeople();
   const events = useEvents();
 
+  const location = useLocation();
+
   return (
-    <div class="grid h-full w-full grid-cols-2 grid-rows-2 gap-6 p-6">
-      <section class="flex flex-col gap-y-3 rounded-lg bg-white p-3">
-        <h2 class="text-xl">Your people</h2>
-        <div class="flex flex-col gap-y-2 overflow-y-auto py-2">
-          {people.value.success ? (
-            people.value.data?.map(
-              ({ id, firstName, lastName, nickName, dob }) => (
-                <PersonCard
-                  key={id}
-                  id={id}
-                  firstName={firstName}
-                  lastName={lastName}
-                  nickName={nickName}
-                  dob={dob}
-                  events={
-                    events.value.data?.filter(
-                      (event) => event.personId === id,
-                    ) || []
-                  }
-                />
-              ),
-            )
-          ) : (
-            <span>{people.value.errorMessage}</span>
-          )}
-        </div>
+    <div class="mx-auto grid h-full w-full grid-rows-[auto_1fr] gap-3 p-3 sm:grid-cols-[40%_auto] md:gap-6 md:p-6 lg:max-w-5xl">
+      <section
+        class={cn("hidden sm:flex flex-col gap-y-3 rounded-lg bg-white p-4", {
+          flex: location.url.pathname === "/dashboard/",
+        })}
+      >
+        <Calendar />
       </section>
-      <section class="row-span-2 gap-y-3 overflow-y-auto rounded-lg bg-white px-3 py-8">
-        <h2 class="w-full text-center text-2xl">Profile</h2>
+      <section
+        class={cn("row-span-2 overflow-y-auto rounded-lg bg-white p-4", {
+          "sm:block hidden": location.url.pathname === "/dashboard/",
+        })}
+      >
         <Slot />
       </section>
-      <section class="flex flex-col gap-y-3 rounded-lg bg-white p-3">
-        <h2 class="text-lg">Your upcoming events</h2>
+      <section
+        class={cn(
+          "flex-col gap-y-2 rounded-lg bg-white p-2 md:p-3 hidden sm:flex min-h-0",
+          {
+            flex: location.url.pathname === "/dashboard/",
+          }
+        )}
+      >
+        <h2 class="flex items-center justify-between text-base md:text-lg">
+          <span>Your upcoming events</span>
+          <SSRLink
+            href="/dashboard/event"
+            variant="icon"
+            class="text-havelock-blue-700 hover:text-havelock-blue-800"
+          >
+            <BsPlusSquareFill />
+          </SSRLink>
+        </h2>
         <div class="flex flex-col gap-y-2 overflow-y-auto py-2">
           {events.value.success ? (
             events.value.data?.map(
@@ -130,7 +118,7 @@ export default component$(() => {
                   firstName={firstName}
                   lastName={lastName}
                 />
-              ),
+              )
             )
           ) : (
             <span>{events.value.errorMessage}</span>

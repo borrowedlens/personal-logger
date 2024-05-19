@@ -1,6 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ["./src/**/*.{js,ts,jsx,tsx,mdx}"],
+  havelockBlue: "selector",
   theme: {
     fontFamily: {
       inter: "Inter",
@@ -33,6 +34,12 @@ export default {
           900: "#792f23",
           950: "#41150e",
         },
+      },
+      backgroundImage: {
+        "app-linear-gradient":
+          "linear-gradient(to bottom right, var(--tw-gradient-stops)), linear-gradient(to top right, var(--tw-gradient-stops))",
+        "app-radial-gradient":
+          "radial-gradient(100% 140% at 0% 0%, var(--tw-gradient-stops)), radial-gradient(360% 80% at 0% 0%, var(--tw-gradient-stops)), radial-gradient(235% 80% at 100% 115%, var(--tw-gradient-stops))",
       },
     },
   },

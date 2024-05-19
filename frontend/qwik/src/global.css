@@ -17,9 +17,9 @@
   @font-face {
     font-family: "InterBold";
     font-style: normal;
-    font-weight: 400;
+    font-weight: 700;
     font-display: swap;
-    src: url(/fonts/Inter-Bold.ttf) format("truetype");
+    src: url("/fonts/Inter-Bold.ttf") format("truetype");
   }
 }
 
@@ -60,7 +60,6 @@ body {
   height: 100vh;
   width: 100vw;
   line-height: inherit;
-  @apply bg-gradient-to-br from-havelock-blue-800 via-purple-600 to-burnt-umber-600;
 }
 
 *,

@@ -1,11 +1,11 @@
 import { component$, useComputed$ } from "@builder.io/qwik";
-import { differenceInCalendarDays } from "date-fns";
-import { type z } from "zod";
-import { type EventModel } from "~/data/models";
+import { differenceInCalendarDays, format } from "date-fns";
+import { type z } from "@builder.io/qwik-city";
+import { type UpcomingEventSchema } from "~/data/models";
 
 interface EventCardProps
   extends Omit<
-    z.infer<typeof EventModel>,
+    z.infer<typeof UpcomingEventSchema>,
     "eventDate" | "isRecurring" | "personId" | "userId" | "id"
   > {}
 
@@ -22,17 +22,30 @@ export const EventCard = component$(
       return differenceInCalendarDays(upcomingDate, new Date());
     });
 
-    const fullName = useComputed$(() => {
-      return `${firstName} ${lastName}`;
+    const displayedName = useComputed$(() => {
+      if (nickName) {
+        return `${nickName}'s`;
+      }
+      if (firstName && lastName) {
+        return `${firstName} ${lastName}'s`;
+      }
+      return "Your";
     });
 
     return (
-      <div class="grid grid-cols-4 items-center gap-x-2 rounded-lg border-l-4 border-l-burnt-umber-500 p-2 hover:cursor-pointer hover:bg-burnt-umber-300">
-        <span class="text-sm font-bold">{eventName}</span>
-        <span class="text-xs">{nickName ? nickName : fullName.value}</span>
+      <div class="grid grid-cols-[1fr_auto] grid-rows-[1fr_auto] items-center justify-between gap-x-2 rounded-lg border-l-4 border-l-havelock-blue-700 p-2 hover:cursor-pointer hover:bg-havelock-blue-100">
+        <span class="inline-flex gap-x-1 text-base md:text-lg">
+          {displayedName.value}
+          <span class="text-base font-bold md:text-lg">{eventName}</span>
+        </span>
+        <span class="text-base text-right font-bold">
+          {format(upcomingDate, "do LLL")}
+        </span>
         <span class="text-xs">{eventDescription}</span>
-        <span class="text-xs">in {nextEventCountdown.value} days</span>
+        <span class="text-xs text-right">
+          in {nextEventCountdown.value} days
+        </span>
       </div>
     );
-  },
+  }
 );

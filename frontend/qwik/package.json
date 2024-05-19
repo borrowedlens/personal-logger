@@ -46,9 +46,10 @@
     "vite-tsconfig-paths": "^4.2.1"
   },
   "dependencies": {
+    "@qwikest/icons": "^0.0.13",
     "clsx": "^2.1.1",
     "date-fns": "^3.6.0",
-    "tailwind-merge": "^2.3.0",
-    "zod": "^3.23.5"
+    "qwik-sonner": "^1.0.2",
+    "tailwind-merge": "^2.3.0"
   }
 }

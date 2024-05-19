@@ -1,79 +1,97 @@
-import { z } from "zod";
+import { z } from "@builder.io/qwik-city";
 
-export interface BaseResponseModel<T> {
+export interface BaseResponseSchema<T> {
   success: boolean;
   errorCode: number;
   errorMessage: string;
   data: T | null;
 }
 
-// "id": 3,
-//     "createdAt": "2024-04-30T04:02:18.927Z",
-//     "updatedAt": "2024-04-30T04:02:18.927Z",
-//     "email": "test@test.com",
-//     "phone": "0000000000",
-//     "dob": "1989-10-14T10:00:00.000Z",
-//     "firstName": "Test",
-//     "lastName": "User"
-
-export const EventModel = z.object({
+export const UpcomingEventSchema = z.object({
   id: z.number(),
-  eventName: z.string(),
-  eventDescription: z.string(),
+  eventName: z.string().min(1),
+  eventDescription: z.string().min(1),
   eventDate: z.coerce.date(),
-  isRecurring: z.boolean(),
-  personId: z.number().nullable(),
+  isRecurring: z.coerce.boolean(),
+  personId: z.coerce.number({ message: "Please select a friend" }),
   userId: z.number().nullable(),
   upcomingDate: z.coerce.date(),
-  nickName: z.string(),
-  firstName: z.string(),
-  lastName: z.string(),
+  nickName: z.string().nullable(), // would be null in case the event belongs to the logged in user
+  firstName: z.string().nullable(), // would be null in case the event belongs to the logged in user
+  lastName: z.string().nullable(), // would be null in case the event belongs to the logged in user
 });
 
-export const EventsModel = z.array(EventModel);
+export const UpcomingEventsSchema = z.array(UpcomingEventSchema);
 
-export const EventsForProfile = z.array(
-  EventModel.omit({
-    nickName: true,
-    firstName: true,
-    lastName: true,
-    upcomingDate: true,
-  }),
-);
+export const EventSchema = UpcomingEventSchema.omit({
+  nickName: true,
+  firstName: true,
+  lastName: true,
+  upcomingDate: true,
+}).partial({ isRecurring: true, userId: true, id: true });
 
-export const UserProfileModel = z.object({
+export const EventsSchema = z.array(EventSchema);
+
+export const UserProfileSchema = z.object({
   id: z.number(),
   firstName: z.string(),
   lastName: z.string(),
   dob: z.coerce.date(),
   phone: z.string(),
-  events: EventsForProfile,
+  events: EventsSchema,
   email: z.string().email(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 });
 
-export const PersonProfileModel = z.object({
-  id: z.number(),
+export const PersonProfileSchema = z.object({
+  id: z.number().optional(),
   firstName: z.string(),
   lastName: z.string(),
   nickName: z.string(),
   dob: z.coerce.date(),
   phone: z.string(),
   email: z.string().email(),
-  events: EventsForProfile,
+  events: EventsSchema.optional(),
 });
 
-const PersonModelBase = PersonProfileModel.omit({
+const PersonSchemaBase = PersonProfileSchema.omit({
   email: true,
   phone: true,
   events: true,
 });
 
-export const PersonModel = PersonModelBase.merge(
+export const PersonSchema = PersonSchemaBase.merge(
   z.object({
-    events: z.array(EventModel.partial().required({ eventDate: true })),
-  }),
+    events: z.array(
+      UpcomingEventSchema.partial().required({ eventDate: true })
+    ),
+  })
 );
 
-export const PeopleModel = z.array(PersonModel);
+export const PeopleSchema = z.array(PersonSchema);
+
+export const SignupSchema = z
+  .object({
+    firstName: z.string(),
+    lastName: z.string(),
+    email: z.string().email(),
+    phone: z.union([z.string().optional(), z.string().length(10)]),
+    password: z.string().min(8),
+    confirmPassword: z.string().min(8),
+    dob: z.coerce.date(),
+  })
+  .refine(
+    (values) => {
+      return values.password === values.confirmPassword;
+    },
+    {
+      message: "Passwords do not match",
+      path: ["confirmPassword"],
+    }
+  );
+
+export const LoginSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(8),
+});

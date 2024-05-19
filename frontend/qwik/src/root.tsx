@@ -7,6 +7,7 @@ import {
 import { RouterHead } from "./components/router-head/router-head";
 
 import "./global.css";
+import { Toaster } from "qwik-sonner";
 
 export default component$(() => {
   /**
@@ -25,6 +26,7 @@ export default component$(() => {
         <ServiceWorkerRegister />
       </head>
       <body lang="en">
+        <Toaster richColors />
         <RouterOutlet />
       </body>
     </QwikCityProvider>

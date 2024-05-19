@@ -1,14 +1,15 @@
 import { component$ } from "@builder.io/qwik";
 import { routeLoader$ } from "@builder.io/qwik-city";
-import { z } from "zod";
+import { z } from "@builder.io/qwik-city";
 import { ProfileBox } from "~/components/profile/profile-box";
-import { type BaseResponseModel, PersonProfileModel } from "~/data/models";
+import { type BaseResponseSchema, PersonProfileSchema } from "~/data/models";
+import { ENV } from "~/lib/constants";
 
 export const usePerson = routeLoader$<
-  BaseResponseModel<z.infer<typeof PersonProfileModel>>
+  BaseResponseSchema<z.infer<typeof PersonProfileSchema>>
 >(async (requestEvent) => {
   const res = await fetch(
-    `http://localhost:3000/person/${requestEvent.params.personId}`,
+    `${ENV.PUBLIC_API_URL}/person/${requestEvent.params.personId}`
   );
   if (!res.ok) {
     return requestEvent.fail(res.status, {
@@ -19,10 +20,9 @@ export const usePerson = routeLoader$<
         "Could not fetch person, please refresh the page / try again later",
     });
   }
-  const person = await res.json();
-  console.log("🚀 ~ > ~ person:", person);
+  const { data } = await res.json();
   try {
-    PersonProfileModel.parse(person);
+    PersonProfileSchema.parse(data.person);
   } catch (error) {
     if (error instanceof z.ZodError) {
       return requestEvent.fail(409, {
@@ -33,7 +33,7 @@ export const usePerson = routeLoader$<
       });
     }
   }
-  return { data: person, errorCode: 0, errorMessage: "", success: true };
+  return { data: data.person, errorCode: 0, errorMessage: "", success: true };
 });
 
 export default component$(() => {

@@ -4,25 +4,17 @@ import {
   getPeopleService,
   getPersonDetailsService,
 } from "../services/personService";
-import {
-  CreatePersonSchema,
-  GetPersonDetailsSchema,
-} from "../models/personModels";
+import { PersonSchema, PersonIdentifierSchema } from "../models/personModels";
 import { ErrorStatusCodes, GlobalError } from "../middleware/errorMiddleware";
 
 export const createPerson: RequestHandler = async (req, res, next) => {
   try {
-    const {
-      firstName,
-      lastName,
-      nickName,
-      dob,
-      userId,
-      email,
-      phone,
-      events,
-      notes,
-    } = CreatePersonSchema.parse(req.body);
+    if (!req.session.user) {
+      throw new GlobalError("Session Expired", ErrorStatusCodes.UNAUTHORIZED);
+    }
+    const userId = req.session.user;
+    const { firstName, lastName, nickName, dob, email, phone, events } =
+      PersonSchema.parse(req.body);
     const personId = await createPersonService({
       firstName,
       lastName,
@@ -32,9 +24,13 @@ export const createPerson: RequestHandler = async (req, res, next) => {
       userId,
       email,
       events,
-      notes,
     });
-    res.json({ id: personId });
+    res.status(200).json({
+      errorCode: 0,
+      errorMessage: "",
+      success: true,
+      data: { personId },
+    });
   } catch (error) {
     next(error);
   }
@@ -42,12 +38,14 @@ export const createPerson: RequestHandler = async (req, res, next) => {
 
 export const getPeople: RequestHandler = async (req, res) => {
   const people = await getPeopleService();
-  res.json(people);
+  res
+    .status(200)
+    .json({ errorCode: 0, errorMessage: "", success: true, data: { people } });
 };
 
 export const getPersonDetails: RequestHandler = async (req, res, next) => {
   try {
-    const { personId } = GetPersonDetailsSchema.parse(req.params);
+    const { personId } = PersonIdentifierSchema.parse(req.params);
     const person = await getPersonDetailsService({ personId });
     if (!person) {
       throw new GlobalError(
@@ -55,7 +53,14 @@ export const getPersonDetails: RequestHandler = async (req, res, next) => {
         ErrorStatusCodes.NOT_FOUND
       );
     }
-    res.json(person);
+    res.status(200).json({
+      errorCode: 0,
+      errorMessage: "",
+      success: true,
+      data: {
+        person,
+      },
+    });
   } catch (error) {
     next(error);
   }

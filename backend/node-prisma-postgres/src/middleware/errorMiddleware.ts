@@ -23,8 +23,14 @@ export const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
   let statusCode = err.statusCode || ErrorStatusCodes.INTERNAL_SERVER_ERROR,
     errorMessage = err.message || "Something went wrong";
   if (err instanceof z.ZodError || err instanceof SyntaxError) {
+    console.log(err.message);
     statusCode = ErrorStatusCodes.BAD_REQUEST;
     errorMessage = "There were errors parsing the request";
   }
-  res.status(statusCode).json({ error: errorMessage });
+  res.status(statusCode).json({
+    errorCode: statusCode,
+    errorMessage: errorMessage,
+    success: false,
+    data: null,
+  });
 };

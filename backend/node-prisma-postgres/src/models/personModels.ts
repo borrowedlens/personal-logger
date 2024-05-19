@@ -1,18 +1,20 @@
 import { z } from "zod";
-import { CreateEventSchema } from "./eventModels";
+import { EventSchema } from "./eventModels";
+import { UserSpecificSchema } from "./userModels";
 
-export const CreatePersonSchema = z.object({
+export const PersonSchema = z.object({
   firstName: z.string(),
   lastName: z.string(),
   nickName: z.string(),
   email: z.string().email(),
   phone: z.string(),
   dob: z.coerce.date(),
-  notes: z.string(),
-  userId: z.number(),
-  events: z.array(CreateEventSchema),
+  notes: z.string().optional(),
+  events: z.array(EventSchema).optional(),
 });
 
-export const GetPersonDetailsSchema = z.object({
+export const UserSpecificPersonSchema = PersonSchema.merge(UserSpecificSchema);
+
+export const PersonIdentifierSchema = z.object({
   personId: z.coerce.number(),
 });

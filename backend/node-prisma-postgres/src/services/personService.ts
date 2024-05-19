@@ -1,7 +1,8 @@
 import { z } from "zod";
 import {
-  CreatePersonSchema,
-  GetPersonDetailsSchema,
+  PersonSchema,
+  PersonIdentifierSchema,
+  UserSpecificPersonSchema,
 } from "../models/personModels";
 import { prismaClient } from "../app";
 
@@ -12,10 +13,22 @@ export const createPersonService = async ({
   phone,
   dob,
   email,
-  notes,
+  notes = "",
   userId,
-  events,
-}: z.infer<typeof CreatePersonSchema>) => {
+  events = [],
+}: z.infer<typeof UserSpecificPersonSchema>) => {
+  const eventsData = [
+    {
+      eventDate: dob,
+      eventDescription: "Big day!",
+      eventName: "Birthday",
+      isRecurring: true,
+      userId,
+    },
+  ];
+  if (events) {
+    eventsData.push(...events.map((event) => ({ userId: userId, ...event })));
+  }
   const { id } = await prismaClient.person.create({
     data: {
       firstName,
@@ -31,15 +44,7 @@ export const createPersonService = async ({
       },
       email,
       events: {
-        create: [
-          {
-            eventDate: dob,
-            eventDescription: "Go out for dinner",
-            eventName: "Birthday",
-            isRecurring: true,
-          },
-          ...events,
-        ],
+        create: eventsData,
       },
     },
   });
@@ -66,7 +71,7 @@ export const getPeopleService = async () => {
 
 export const getPersonDetailsService = async ({
   personId,
-}: z.infer<typeof GetPersonDetailsSchema>) => {
+}: z.infer<typeof PersonIdentifierSchema>) => {
   const person = await prismaClient.person.findFirst({
     where: {
       id: Number(personId),

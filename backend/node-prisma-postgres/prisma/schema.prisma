@@ -13,12 +13,20 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Session {
+  id        String   @id
+  sid       String   @unique
+  data      String
+  expiresAt DateTime
+}
+
 model User {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt()
   email     String   @unique
   phone     String   @unique
+  password  String
   dob       DateTime @default("1989-10-14T10:00:00Z")
   firstName String
   lastName  String
@@ -30,9 +38,11 @@ model User {
 
 model Person {
   id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt()
   firstName String
   lastName  String
-  nickName  String?  
+  nickName  String?
   email     String   @unique
   phone     String?  @unique
   dob       DateTime
@@ -46,14 +56,16 @@ model Person {
 
 model Event {
   id               Int      @id @default(autoincrement())
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @default(now()) @updatedAt()
   eventName        String
   eventDescription String
   eventDate        DateTime
   isRecurring      Boolean
   person           Person?  @relation(fields: [personId], references: [id])
   personId         Int?
-  User             User?    @relation(fields: [userId], references: [id])
-  userId           Int?
+  user             User     @relation(fields: [userId], references: [id])
+  userId           Int
 
   @@map("events")
 }

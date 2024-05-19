@@ -5,8 +5,8 @@ INSERT INTO eventsschema.events ("eventName", "eventDescription", "eventDate", "
 VALUES ('My Birthday', 'Another desc', '1989-10-14T00:00:00.000Z', TRUE, 7, 11);
 
 UPDATE eventsschema.events
-SET "isRecurring" = True
-WHERE events."eventName" = 'My Birthday';
+SET "eventDescription" = 'Big Day'
+WHERE id = 45;
 
 SELECT *
 FROM
@@ -41,7 +41,7 @@ ORDER BY "upcomingDate" ASC;
 
 DELETE
 FROM eventsschema.events
-WHERE date_part('day', "createdAt") = date_part('day', now());
+WHERE id=46;
 
 DROP TABLE eventsschema.users;
 

@@ -9,7 +9,7 @@ import {
 } from "date-fns";
 import { BsArrowRightShort, BsArrowLeftShort } from "@qwikest/icons/bootstrap";
 
-import { CustomButton } from "../button/custom-button";
+import { OutlineButton } from "../button/outline-button";
 import { cn } from "~/lib/utils";
 
 export const Calendar = component$(() => {
@@ -25,7 +25,7 @@ export const Calendar = component$(() => {
       length: daysInMonth,
     }).map((_, index) => index + 1);
     datesArray.unshift(
-      ...Array.from({ length: nullBoxesInBeginning }).map(() => false)
+      ...Array.from({ length: nullBoxesInBeginning }).map(() => false),
     );
     datesArray.push(...Array.from({ length: nullBoxesInEnd }).map(() => false));
     return datesArray;
@@ -38,15 +38,15 @@ export const Calendar = component$(() => {
   return (
     <>
       <div class="flex items-center justify-center gap-x-2">
-        <CustomButton variant="outline" onClick$={() => handleMonthChange(-1)}>
+        <OutlineButton onClick$={() => handleMonthChange(-1)}>
           <BsArrowLeftShort />
-        </CustomButton>
+        </OutlineButton>
         <span class="w-[100px] text-center">
           {format(displayedMonth.value, "LLL yyyy")}
         </span>
-        <CustomButton variant="outline" onClick$={() => handleMonthChange(1)}>
+        <OutlineButton onClick$={() => handleMonthChange(1)}>
           <BsArrowRightShort />
-        </CustomButton>
+        </OutlineButton>
       </div>
       <div class="grid grid-cols-7 justify-items-center gap-y-1 text-xs">
         <span class="font-bold">Su</span>

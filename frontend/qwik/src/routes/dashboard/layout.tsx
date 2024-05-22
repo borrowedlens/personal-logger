@@ -9,10 +9,12 @@ import { BsPlusSquareFill } from "@qwikest/icons/bootstrap";
 
 import { Calendar } from "~/components/calendar/calendar";
 import { EventCard } from "~/components/cards/event-card";
-import { SSRLink } from "~/components/ssr-link/ssr-link";
-import { type BaseResponseSchema, UpcomingEventsSchema } from "~/data/models";
+import { Header } from "~/components/header/header";
+import { OutlineSSR } from "~/components/ssr-links/outline-ssr";
+import { type BaseResponseSchema } from "~/models/Person";
 import { ENV } from "~/lib/constants";
 import { cn } from "~/lib/utils";
+import { UpcomingEventsSchema } from "~/models/Event";
 
 export const onGet: RequestHandler = async ({ request, redirect }) => {
   const res = await fetch(`${ENV.PUBLIC_API_URL}/auth`, {
@@ -64,67 +66,75 @@ export default component$(() => {
   const location = useLocation();
 
   return (
-    <div class="mx-auto grid h-full w-full grid-rows-[auto_1fr] gap-3 p-3 sm:grid-cols-[40%_auto] md:gap-6 md:p-6 lg:max-w-5xl">
-      <section
-        class={cn("hidden sm:flex flex-col gap-y-3 rounded-lg bg-white p-4", {
-          flex: location.url.pathname === "/dashboard/",
-        })}
-      >
-        <Calendar />
-      </section>
-      <section
-        class={cn("row-span-2 overflow-y-auto rounded-lg bg-white p-4", {
-          "sm:block hidden": location.url.pathname === "/dashboard/",
-        })}
-      >
-        <Slot />
-      </section>
-      <section
-        class={cn(
-          "flex-col gap-y-2 rounded-lg bg-white p-2 md:p-3 hidden sm:flex min-h-0",
-          {
+    <>
+      <Header />
+      <main class="grid h-full w-full grid-rows-[auto_1fr] gap-3 bg-app-linear-gradient from-havelock-blue-100 from-50% to-white p-3 sm:grid-cols-[30%_auto_30%] md:gap-6 md:p-6 md:pt-20">
+        <section
+          class={cn("hidden flex-col gap-y-3 rounded-lg bg-white p-4 sm:flex", {
             flex: location.url.pathname === "/dashboard/",
-          }
-        )}
-      >
-        <h2 class="flex items-center justify-between text-base md:text-lg">
-          <span>Your upcoming events</span>
-          <SSRLink
-            href="/dashboard/event"
-            variant="icon"
-            class="text-havelock-blue-700 hover:text-havelock-blue-800"
-          >
-            <BsPlusSquareFill />
-          </SSRLink>
-        </h2>
-        <div class="flex flex-col gap-y-2 overflow-y-auto py-2">
-          {events.value.success ? (
-            events.value.data?.map(
-              ({
-                id,
-                eventName,
-                eventDescription,
-                upcomingDate,
-                nickName,
-                firstName,
-                lastName,
-              }) => (
-                <EventCard
-                  key={id}
-                  eventName={eventName}
-                  upcomingDate={upcomingDate}
-                  eventDescription={eventDescription}
-                  nickName={nickName}
-                  firstName={firstName}
-                  lastName={lastName}
-                />
-              )
-            )
-          ) : (
-            <span>{events.value.errorMessage}</span>
+          })}
+        >
+          <Calendar />
+        </section>
+        <section
+          class={cn(
+            "row-span-2 flex flex-col gap-y-2 overflow-y-auto rounded-lg bg-white p-4",
+            {
+              "hidden sm:block": location.url.pathname === "/dashboard/",
+            },
           )}
-        </div>
-      </section>
-    </div>
+        >
+          <Slot />
+        </section>
+        <section
+          class={cn("row-span-2 overflow-y-auto rounded-lg bg-white p-4", {
+            "hidden sm:block": location.url.pathname === "/dashboard/",
+          })}
+        >
+          <div>Dummy div</div>
+        </section>
+        <section
+          class={cn(
+            "hidden min-h-0 flex-col gap-y-2 rounded-lg bg-white p-2 sm:flex md:p-3",
+            {
+              flex: location.url.pathname === "/dashboard/",
+            },
+          )}
+        >
+          <h2 class="flex items-center justify-between text-base md:text-lg">
+            <span>Your upcoming events</span>
+            <OutlineSSR href="/dashboard/event" class="p-1">
+              <BsPlusSquareFill />
+            </OutlineSSR>
+          </h2>
+          <div class="flex flex-col overflow-y-auto py-2">
+            {events.value.success ? (
+              events.value.data?.map(
+                ({
+                  id,
+                  eventName,
+                  upcomingDate,
+                  nickName,
+                  firstName,
+                  lastName,
+                }) => (
+                  <EventCard
+                    key={id}
+                    id={id}
+                    eventName={eventName}
+                    upcomingDate={upcomingDate}
+                    nickName={nickName}
+                    firstName={firstName}
+                    lastName={lastName}
+                  />
+                ),
+              )
+            ) : (
+              <span>{events.value.errorMessage}</span>
+            )}
+          </div>
+        </section>
+      </main>
+    </>
   );
 });

@@ -1,17 +1,23 @@
 import { component$, useComputed$ } from "@builder.io/qwik";
 import { differenceInCalendarDays, format } from "date-fns";
 import { type z } from "@builder.io/qwik-city";
-import { type UpcomingEventSchema } from "~/data/models";
+import { BsPencilFill } from "@qwikest/icons/bootstrap";
+import { BsTrash3Fill } from "@qwikest/icons/bootstrap";
+import { OutlineButton } from "../button/outline-button";
+import { DaysLabel } from "../labels/days-label";
+// import { OutlineSSR } from "../ssr-links/outline-ssr";
+import { type UpcomingEventResponseSchema } from "~/models/Event";
+import { OutlineCSR } from "../csr-links/outline-csr";
 
 interface EventCardProps
   extends Omit<
-    z.infer<typeof UpcomingEventSchema>,
-    "eventDate" | "isRecurring" | "personId" | "userId" | "id"
+    z.infer<typeof UpcomingEventResponseSchema>,
+    "eventDate" | "isRecurring" | "personId" | "userId" | "eventDescription"
   > {}
 
 export const EventCard = component$(
   ({
-    eventDescription,
+    id,
     eventName,
     upcomingDate,
     nickName,
@@ -33,19 +39,29 @@ export const EventCard = component$(
     });
 
     return (
-      <div class="grid grid-cols-[1fr_auto] grid-rows-[1fr_auto] items-center justify-between gap-x-2 rounded-lg border-l-4 border-l-havelock-blue-700 p-2 hover:cursor-pointer hover:bg-havelock-blue-100">
-        <span class="inline-flex gap-x-1 text-base md:text-lg">
-          {displayedName.value}
-          <span class="text-base font-bold md:text-lg">{eventName}</span>
-        </span>
-        <span class="text-base text-right font-bold">
-          {format(upcomingDate, "do LLL")}
-        </span>
-        <span class="text-xs">{eventDescription}</span>
-        <span class="text-xs text-right">
-          in {nextEventCountdown.value} days
-        </span>
+      <div class="flex items-center justify-between gap-x-2 gap-y-1 border-b-1 border-b-slate-300 p-2 text-sm hover:cursor-pointer hover:bg-havelock-blue-100">
+        <div class="flex flex-col gap-x-1">
+          <div class="flex items-center justify-start gap-x-1 text-left">
+            <span>{displayedName.value}</span>
+            <strong>{eventName}</strong>
+          </div>
+          <div class="flex items-center justify-start gap-x-1 text-left">
+            <span class="text-right">{format(upcomingDate, "do LLL")}</span>
+            <DaysLabel daysRemaining={nextEventCountdown.value} />
+          </div>
+        </div>
+        <div class="row-span-2 flex items-center gap-x-1">
+          <OutlineCSR
+            href={`/dashboard/event/${id}?edit=true`}
+            class="p-1 text-havelock-blue-400 hover:text-havelock-blue-800"
+          >
+            <BsPencilFill />
+          </OutlineCSR>
+          <OutlineButton class="p-1 text-havelock-blue-400 hover:text-havelock-blue-800 md:p-1">
+            <BsTrash3Fill />
+          </OutlineButton>
+        </div>
       </div>
     );
-  }
+  },
 );

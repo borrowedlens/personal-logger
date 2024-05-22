@@ -1,5 +1,5 @@
 import {
-  $,
+  // $,
   component$,
   useComputed$,
   useSignal,
@@ -14,17 +14,16 @@ import {
   zod$,
 } from "@builder.io/qwik-city";
 import { toast } from "qwik-sonner";
-import { CustomButton } from "~/components/button/custom-button";
+// import { OutlineButton } from "~/components/button/outline-button";
+import { PrimaryButton } from "~/components/button/primary-button";
 import { CustomInput } from "~/components/input/custom-input";
 import { CustomSelect } from "~/components/select/custom-select";
-import { SSRLink } from "~/components/ssr-link/ssr-link";
-import {
-  type BaseResponseSchema,
-  PeopleSchema,
-  EventSchema,
-} from "~/data/models";
+import { SecondarySSR } from "~/components/ssr-links/secondary-ssr";
+import { type BaseResponseSchema, PeopleSchema } from "~/models/Person";
 import { ENV } from "~/lib/constants";
-import { setSearchParam } from "~/lib/utils";
+// import { setSearchParam } from "~/lib/utils";
+import { AddEventSchema } from "~/models/Event";
+import { OutlineSSR } from "~/components/ssr-links/outline-ssr";
 
 export const usePeople = routeLoader$<
   BaseResponseSchema<z.infer<typeof PeopleSchema>>
@@ -60,7 +59,7 @@ export const usePeople = routeLoader$<
 export const useAddEvent = routeAction$(
   async (
     { eventName, eventDescription, eventDate, personId, ...optionals },
-    { request }
+    { request },
   ) => {
     const stringifiedBody = JSON.stringify({
       eventName,
@@ -79,10 +78,10 @@ export const useAddEvent = routeAction$(
       credentials: "include",
       body: stringifiedBody,
     });
-    const data = await res.json();
-    return { success: true, id: data.data.eventId };
+    const { data } = await res.json();
+    return { success: true, id: data.eventId };
   },
-  zod$(EventSchema)
+  zod$(AddEventSchema),
 );
 
 export default component$(() => {
@@ -93,7 +92,7 @@ export default component$(() => {
     people.value.data?.map((person) => ({
       label: person.nickName || `${person.firstName} ${person.lastName}`,
       value: person.id!,
-    }))
+    })),
   );
 
   const navigate = useNavigate();
@@ -108,93 +107,88 @@ export default component$(() => {
     }
   });
 
-  const handleNavigation = $(() => {
-    const currentFormData = new FormData(formRef.value);
-    const navigationUrl = new URL(`${ENV.PUBLIC_UI_URL}/dashboard/person`);
-    setSearchParam(navigationUrl, currentFormData, "eventName");
-    setSearchParam(navigationUrl, currentFormData, "eventDate");
-    setSearchParam(navigationUrl, currentFormData, "isRecurring");
-    setSearchParam(navigationUrl, currentFormData, "eventDescription");
-    navigate(navigationUrl.toString());
-  });
+  // const handleNavigation = $(() => {
+  //   const currentFormData = new FormData(formRef.value);
+  //   const navigationUrl = new URL(`${ENV.PUBLIC_UI_URL}/dashboard/person`);
+  //   setSearchParam(navigationUrl, currentFormData, "eventName");
+  //   setSearchParam(navigationUrl, currentFormData, "eventDate");
+  //   setSearchParam(navigationUrl, currentFormData, "isRecurring");
+  //   setSearchParam(navigationUrl, currentFormData, "eventDescription");
+  //   navigate(navigationUrl.toString());
+  // });
 
   return (
-    <div class="row-span-2 overflow-y-auto rounded-lg bg-white">
-      <section class="flex flex-col gap-y-4 rounded-lg bg-white text-slate-900">
-        <h2 class="md:text-lg">Add an event</h2>
-        <Form class="grid gap-y-2" action={action} ref={formRef}>
-          <fieldset class="flex flex-col items-start sm:flex-row gap-x-2">
-            <label class="flex w-full flex-col gap-y-1 text-xs text-slate-800">
-              Event Name*
-              <CustomInput name="eventName"></CustomInput>
-              {action.value?.failed && (
-                <span class="text-burnt-umber-700">
-                  {action.value.fieldErrors.eventName}
-                </span>
-              )}
-            </label>
-            <label class="flex w-full flex-col gap-y-1 text-xs text-slate-800">
-              Event Date*
-              <CustomInput name="eventDate" type="date"></CustomInput>
-              {action.value?.failed && (
-                <span class="text-burnt-umber-700">
-                  {action.value.fieldErrors.eventDate}
-                </span>
-              )}
-            </label>
-          </fieldset>
-          <label class="flex w-full items-center gap-x-1 text-xs text-slate-800">
-            Annually recurring event?
-            <CustomInput
-              name="isRecurring"
-              type="checkbox"
-              value="true"
-            ></CustomInput>
-          </label>
-          <fieldset class="grid grid-cols-2 grid-rows-[auto_1fr_auto] items-center">
-            <label
-              for="personId"
-              class="flex w-full flex-col gap-y-1 text-xs text-slate-800"
-            >
-              Friend*
-            </label>
-            <CustomButton
-              variant="outline"
-              class="text-right text-xs"
-              type="button"
-              onClick$={handleNavigation}
-            >
-              Add Friend
-            </CustomButton>
-            <CustomSelect
-              class="col-span-2"
-              id="personId"
-              name="personId"
-              options={peopleOptions.value || []}
-            ></CustomSelect>
-            {action.value?.failed && (
-              <span class="text-burnt-umber-700 col-span-2 text-xs">
-                {action.value.fieldErrors.personId}
-              </span>
-            )}
-          </fieldset>
+    <>
+      <h2 class="md:text-lg">Add an event</h2>
+      <Form class="grid gap-y-2" action={action} ref={formRef}>
+        <fieldset class="flex flex-col items-start gap-x-2 sm:flex-row">
           <label class="flex w-full flex-col gap-y-1 text-xs text-slate-800">
-            Event Description*
-            <CustomInput name="eventDescription"></CustomInput>
+            Event Name*
+            <CustomInput name="eventName"></CustomInput>
             {action.value?.failed && (
               <span class="text-burnt-umber-700">
-                {action.value.fieldErrors.eventDescription}
+                {action.value.fieldErrors.eventName}
               </span>
             )}
           </label>
-          <fieldset class="flex items-center justify-between mt-2">
-            <SSRLink href="/dashboard" variant="secondary">
-              BACK
-            </SSRLink>
-            <CustomButton variant="primary">ADD EVENT</CustomButton>
-          </fieldset>
-        </Form>
-      </section>
-    </div>
+          <label class="flex w-full flex-col gap-y-1 text-xs text-slate-800">
+            Event Date*
+            <CustomInput name="eventDate" type="date"></CustomInput>
+            {action.value?.failed && (
+              <span class="text-burnt-umber-700">
+                {action.value.fieldErrors.eventDate}
+              </span>
+            )}
+          </label>
+        </fieldset>
+        <label class="flex w-full items-center gap-x-1 text-xs text-slate-800">
+          Annually recurring event?
+          <CustomInput
+            name="isRecurring"
+            type="checkbox"
+            value="true"
+          ></CustomInput>
+        </label>
+        <fieldset class="grid grid-cols-2 grid-rows-[auto_1fr_auto] items-center">
+          <label
+            for="personId"
+            class="flex w-full flex-col gap-y-1 text-xs text-slate-800"
+          >
+            Friend*
+          </label>
+          <OutlineSSR
+            class="text-right text-xs"
+            type="button"
+            href="/dashboard/person"
+          >
+            Add Friend
+          </OutlineSSR>
+          <CustomSelect
+            class="col-span-2"
+            id="personId"
+            name="personId"
+            options={peopleOptions.value || []}
+          ></CustomSelect>
+          {action.value?.failed && (
+            <span class="col-span-2 text-xs text-burnt-umber-700">
+              {action.value.fieldErrors.personId}
+            </span>
+          )}
+        </fieldset>
+        <label class="flex w-full flex-col gap-y-1 text-xs text-slate-800">
+          Event Description*
+          <CustomInput name="eventDescription"></CustomInput>
+          {action.value?.failed && (
+            <span class="text-burnt-umber-700">
+              {action.value.fieldErrors.eventDescription}
+            </span>
+          )}
+        </label>
+        <fieldset class="mt-2 flex items-center justify-between">
+          <SecondarySSR href="/dashboard">Back</SecondarySSR>
+          <PrimaryButton>Add Event</PrimaryButton>
+        </fieldset>
+      </Form>
+    </>
   );
 });

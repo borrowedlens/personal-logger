@@ -2,7 +2,7 @@ import { component$ } from "@builder.io/qwik";
 import { routeLoader$ } from "@builder.io/qwik-city";
 import { z } from "@builder.io/qwik-city";
 import { ProfileBox } from "~/components/profile/profile-box";
-import { type BaseResponseSchema, UserProfileSchema } from "~/data/models";
+import { type BaseResponseSchema, UserProfileSchema } from "~/models/Person";
 import { ENV } from "~/lib/constants";
 
 export const useUser = routeLoader$<

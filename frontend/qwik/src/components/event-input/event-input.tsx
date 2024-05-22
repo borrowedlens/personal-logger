@@ -2,54 +2,69 @@ import { component$ } from "@builder.io/qwik";
 import { CustomInput } from "../input/custom-input";
 
 interface EventInputProps {
-  index: number;
-  name?: string;
-  date?: string;
-  description?: string;
+  index?: number;
+  eventName?: string;
+  eventDate?: string;
+  eventDescription?: string;
   isRecurring?: boolean;
+  inEditMode: boolean;
 }
 
 export const EventInput = component$(
-  ({ index, name, date, description, isRecurring }: EventInputProps) => {
+  ({
+    index,
+    eventName,
+    eventDate,
+    eventDescription,
+    isRecurring,
+    inEditMode,
+  }: EventInputProps) => {
     return (
-      <div class="rounded-lg bg-havelock-blue-100 p-2">
-        <section class="flex flex-col gap-y-2 rounded-lg text-slate-900">
-          <fieldset class="flex flex-col sm:flex-row gap-x-2">
-            <label class="flex w-full flex-col gap-y-1 text-xs text-slate-800">
-              Event Name*
-              <CustomInput
-                name={`events.${index}.eventName`}
-                defaultValue={name}
-              ></CustomInput>
-            </label>
-            <label class="flex w-full flex-col gap-y-1 text-xs text-slate-800">
-              Event Date*
-              <CustomInput
-                name={`events.${index}.eventDate`}
-                type="date"
-                defaultValue={date}
-              ></CustomInput>
-            </label>
-          </fieldset>
-          <label class="flex w-full items-center gap-x-1 text-xs text-slate-800">
-            Annually recurring event?
+      <>
+        <fieldset class="flex flex-col gap-x-2 sm:flex-row">
+          <label class="flex w-full flex-col gap-y-1 text-xs text-slate-800">
+            Event Name*
             <CustomInput
-              class="accent-havelock-blue-700"
-              name={`events.${index}.isRecurring`}
-              type="checkbox"
-              value="true"
-              checked={isRecurring}
+              name={index ? `events.${index}.eventName` : "eventName"}
+              defaultValue={eventName}
+              disabled={!inEditMode}
+              class="disabled:border-none disabled:bg-transparent disabled:p-0"
             ></CustomInput>
           </label>
           <label class="flex w-full flex-col gap-y-1 text-xs text-slate-800">
-            Event Description*
+            Event Date*
             <CustomInput
-              name={`events.${index}.eventDescription`}
-              defaultValue={description}
+              name={index ? `events.${index}.eventDate` : "eventDate"}
+              type="date"
+              defaultValue={eventDate}
+              disabled={!inEditMode}
+              class="disabled:border-none disabled:bg-transparent disabled:p-0"
             ></CustomInput>
           </label>
-        </section>
-      </div>
+        </fieldset>
+        <label class="flex w-full items-center gap-x-1 text-xs text-slate-800">
+          Annually recurring event?
+          <CustomInput
+            class="accent-havelock-blue-700"
+            name={index ? `events.${index}.isRecurring` : "isRecurring"}
+            type="checkbox"
+            value="true"
+            checked={isRecurring}
+            disabled={!inEditMode}
+          ></CustomInput>
+        </label>
+        <label class="flex w-full flex-col gap-y-1 text-xs text-slate-800">
+          Event Description*
+          <CustomInput
+            name={
+              index ? `events.${index}.eventDescription` : "eventDescription"
+            }
+            defaultValue={eventDescription}
+            disabled={!inEditMode}
+            class="disabled:border-none disabled:bg-transparent disabled:p-0"
+          ></CustomInput>
+        </label>
+      </>
     );
-  }
+  },
 );

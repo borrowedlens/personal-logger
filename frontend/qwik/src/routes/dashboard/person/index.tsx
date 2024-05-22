@@ -3,20 +3,21 @@ import {
   Form,
   routeAction$,
   useLocation,
-  z,
+  type z,
   zod$,
 } from "@builder.io/qwik-city";
-import { CustomButton } from "~/components/button/custom-button";
+import { PrimaryButton } from "~/components/button/primary-button";
+import { SecondaryButton } from "~/components/button/secondary-button";
 import { EventInput } from "~/components/event-input/event-input";
 import { CustomInput } from "~/components/input/custom-input";
-import { SSRLink } from "~/components/ssr-link/ssr-link";
-import { PersonProfileSchema } from "~/data/models";
+import { SecondarySSR } from "~/components/ssr-links/secondary-ssr";
+import { PersonProfileSchema } from "~/models/Person";
 import { ENV } from "~/lib/constants";
 
 export const useAddPerson = routeAction$(
   async (
     { firstName, lastName, nickName, dob, phone, email, events },
-    { request }
+    { request },
   ) => {
     const reqBody: z.infer<typeof PersonProfileSchema> = {
       firstName,
@@ -48,13 +49,14 @@ export const useAddPerson = routeAction$(
     const data = await res.json();
     return { success: true, id: data.data.personId };
   },
-  zod$(PersonProfileSchema)
+  zod$(PersonProfileSchema),
 );
 
 export default component$(() => {
   const location = useLocation();
   const searchParams = location.url.searchParams;
   const eventName = searchParams.get("eventName") || "";
+  console.log("🚀 ~ eventName:", eventName)
   const eventDate = searchParams.get("eventDate") || "";
   const eventIsRecurring = searchParams.get("isRecurring") || "";
   const eventDescription = searchParams.get("eventDescription") || "";
@@ -67,13 +69,13 @@ export default component$(() => {
   const action = useAddPerson();
 
   return (
-    <section class="flex flex-col gap-y-4 rounded-lg bg-white text-slate-900 h-full">
+    <section class="flex h-full flex-col gap-y-4 rounded-lg bg-white text-slate-900">
       <h2 class="md:text-lg">Add Friend</h2>
       <Form
-        class="grid gap-y-2 relative overflow-y-auto h-full px-2 content-start"
+        class="relative grid h-full content-start gap-y-2 overflow-y-auto px-2"
         action={action}
       >
-        <fieldset class="flex gap-x-2 flex-col sm:flex-row gap-y-2">
+        <fieldset class="flex flex-col gap-x-2 gap-y-2 sm:flex-row">
           <label class="flex w-full flex-col gap-y-1 text-xs text-slate-800">
             Firstname*
             <CustomInput name="firstName"></CustomInput>
@@ -83,7 +85,7 @@ export default component$(() => {
             <CustomInput name="lastName"></CustomInput>
           </label>
         </fieldset>
-        <fieldset class="flex gap-x-2 flex-col sm:flex-row gap-y-2">
+        <fieldset class="flex flex-col gap-x-2 gap-y-2 sm:flex-row">
           <label class="flex w-full flex-col gap-y-1 text-xs text-slate-800">
             Nickname
             <CustomInput name="nickName"></CustomInput>
@@ -93,7 +95,7 @@ export default component$(() => {
             <CustomInput name="dob" type="date"></CustomInput>
           </label>
         </fieldset>
-        <fieldset class="flex gap-x-2 flex-col sm:flex-row gap-y-2">
+        <fieldset class="flex flex-col gap-x-2 gap-y-2 sm:flex-row">
           <label class="flex w-full flex-col gap-y-1 text-xs text-slate-800">
             Phone
             <CustomInput name="phone"></CustomInput>
@@ -104,37 +106,39 @@ export default component$(() => {
           </label>
         </fieldset>
         {eventInProgress ? (
-          <EventInput
-            index={0}
-            name={eventName}
-            date={eventDate}
-            isRecurring={Boolean(eventIsRecurring)}
-            description={eventDescription}
-          />
+          <fieldset class="rounded-md bg-havelock-blue-100 p-2">
+            <EventInput
+              inEditMode={true}
+              index={0}
+              eventName={eventName}
+              eventDate={eventDate}
+              isRecurring={Boolean(eventIsRecurring)}
+              eventDescription={eventDescription}
+            />
+          </fieldset>
         ) : null}
         {additionalEventIds.map((eventId) => (
-          <EventInput key={eventId} index={eventId} />
+          <fieldset key={eventId} class="rounded-md bg-havelock-blue-100 p-2">
+            <EventInput inEditMode={true} index={eventId} />
+          </fieldset>
         ))}
-        <fieldset class="w-full flex items-center justify-center">
-          <CustomButton
-            variant="secondary"
+        <fieldset class="flex w-full items-center justify-center">
+          <SecondaryButton
             type="button"
             onClick$={() => {
               additionalEventIds.push(
                 eventInProgress
                   ? additionalEventIds.length + 1
-                  : additionalEventIds.length
+                  : additionalEventIds.length,
               );
             }}
           >
             ADD EVENT
-          </CustomButton>
+          </SecondaryButton>
         </fieldset>
-        <fieldset class="flex items-center justify-between mt-2 sticky bottom-0 left-0 bg-white pt-2">
-          <SSRLink href={`/dashboard/event`} variant="secondary">
-            BACK
-          </SSRLink>
-          <CustomButton variant="primary">ADD FRIEND</CustomButton>
+        <fieldset class="sticky bottom-0 left-0 mt-2 flex items-center justify-between bg-white pt-2">
+          <SecondarySSR href={`/dashboard/event`}>Back</SecondarySSR>
+          <PrimaryButton>Add Friend</PrimaryButton>
         </fieldset>
       </Form>
     </section>

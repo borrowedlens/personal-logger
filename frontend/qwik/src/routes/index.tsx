@@ -5,11 +5,11 @@ import {
   zod$,
   type DocumentHead,
 } from "@builder.io/qwik-city";
-import { CustomButton } from "~/components/button/custom-button";
+import { PrimaryButton } from "~/components/button/primary-button";
 import { CustomInput } from "~/components/input/custom-input";
-import { SSRLink } from "~/components/ssr-link/ssr-link";
-import { LoginSchema } from "~/data/models";
+import { OutlineSSR } from "~/components/ssr-links/outline-ssr";
 import { ENV } from "~/lib/constants";
+import { LoginSchema } from "~/models/User";
 
 export const useLogin = routeAction$(
   async (user, { fail, headers, redirect }) => {
@@ -26,7 +26,6 @@ export const useLogin = routeAction$(
         error: "Login failed",
       });
     }
-    console.log("🚀 ~ res.headers:", res.headers);
     for (const [key, value] of res.headers.entries()) {
       headers.set(key, value);
     }
@@ -35,13 +34,13 @@ export const useLogin = routeAction$(
       throw redirect(302, "/dashboard");
     }
   },
-  zod$(LoginSchema)
+  zod$(LoginSchema),
 );
 
 export default component$(() => {
   const action = useLogin();
   return (
-    <div class="grid h-full w-full place-items-center p-16">
+    <main class="grid h-full w-full place-items-center bg-app-login-radial from-havelock-blue-300 from-20% to-40% p-16">
       <section class="grid min-h-[80%] max-w-[80%] place-items-center rounded-lg bg-white p-6 text-slate-900 md:grid-cols-[60%_auto]">
         <article class="border-r-2 border-r-slate-300 p-8 text-left">
           <span>Welcome to your very own</span>
@@ -55,31 +54,25 @@ export default component$(() => {
         >
           <label class="flex w-full flex-col gap-y-1 text-xs text-slate-800">
             Email
-            <CustomInput
-              name="email"
-              value="vivekprasad1410@gmail.com"
-            ></CustomInput>
+            <CustomInput name="email" value="vivek@test.com"></CustomInput>
           </label>
           <label class="flex w-full flex-col gap-y-1 text-xs text-slate-800">
             Password
-            <CustomInput name="password" value="Hello@123"></CustomInput>
+            <CustomInput name="password" value="Hello12345"></CustomInput>
           </label>
-          <CustomButton class="justify-self-end" variant="primary">
-            LOGIN
-          </CustomButton>
+          <PrimaryButton class="justify-self-end">Login</PrimaryButton>
           <span>
             Don't have an account?{" "}
-            <SSRLink
-              variant="outline"
-              class="text-havelock-blue-700"
+            <OutlineSSR
+              class="underline-offset-2 hover:underline"
               href="/signup"
             >
               Signup
-            </SSRLink>
+            </OutlineSSR>
           </span>
         </Form>
       </section>
-    </div>
+    </main>
   );
 });
 

@@ -1,13 +1,6 @@
-import {
-  component$,
-  Slot,
-  useContextProvider,
-  useSignal,
-} from "@builder.io/qwik";
+import { component$, Slot } from "@builder.io/qwik";
 import { routeLoader$ } from "@builder.io/qwik-city";
 import type { RequestHandler } from "@builder.io/qwik-city";
-import { Header } from "~/components/header/header";
-import { ThemeContext } from "~/data/store";
 
 export const onGet: RequestHandler = async ({ cacheControl }) => {
   // Control caching for this request for best performance and to reduce hosting costs:
@@ -27,14 +20,5 @@ export const useServerTimeLoader = routeLoader$(() => {
 });
 
 export default component$(() => {
-  const theme = useSignal("havelock-blue");
-  useContextProvider(ThemeContext, theme);
-  return (
-    <>
-      <Header />
-      <main class="h-full bg-app-radial-gradient from-havelock-blue-300 from-40% to-45% pt-14">
-        <Slot />
-      </main>
-    </>
-  );
+  return <Slot />;
 });

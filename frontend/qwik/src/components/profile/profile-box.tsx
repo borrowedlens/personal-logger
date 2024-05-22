@@ -1,7 +1,7 @@
 import { component$, useComputed$ } from "@builder.io/qwik";
 import { format } from "date-fns";
 import { type z } from "@builder.io/qwik-city";
-import { type PersonProfileSchema } from "~/data/models";
+import { type PersonProfileSchema } from "~/models/Person";
 
 interface ProfileBoxProps
   extends Omit<z.infer<typeof PersonProfileSchema>, "nickName" | "id"> {}
@@ -15,11 +15,11 @@ export const ProfileBox = component$(
     return (
       <>
         <h2 class="w-full text-center text-2xl">Profile</h2>
-        <div class="flex flex-col items-center justify-center gap-y-6 p-8 font-display">
+        <div class="font-display flex flex-col items-center justify-center gap-y-6 p-8">
           <div class="flex h-40 w-40 items-center justify-center rounded-full bg-havelock-blue-100 text-8xl text-white">
             {firstName[0].toUpperCase()}
           </div>
-          <span class="text-4xl font-bold text-havelock-blue-700 text-center">
+          <span class="text-center text-4xl font-bold text-havelock-blue-700">
             {fullName}
           </span>
           <div class="flex w-full flex-wrap items-center justify-center gap-6">
@@ -39,12 +39,12 @@ export const ProfileBox = component$(
             </label>
           </div>
           <div class="flex flex-col">
-            {events.map((event) => (
+            {events?.map((event) => (
               <span key={event.id}>{event.eventName}</span>
             ))}
           </div>
         </div>
       </>
     );
-  }
+  },
 );

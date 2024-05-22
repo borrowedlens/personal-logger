@@ -7,6 +7,12 @@ export default {
       inter: "Inter",
     },
     extend: {
+      borderWidth: {
+        1: "1px",
+      },
+      fontSize: {
+        "2xs": "10px",
+      },
       colors: {
         "havelock-blue": {
           50: "#f0f7fe",
@@ -38,8 +44,8 @@ export default {
       backgroundImage: {
         "app-linear-gradient":
           "linear-gradient(to bottom right, var(--tw-gradient-stops)), linear-gradient(to top right, var(--tw-gradient-stops))",
-        "app-radial-gradient":
-          "radial-gradient(100% 140% at 0% 0%, var(--tw-gradient-stops)), radial-gradient(360% 80% at 0% 0%, var(--tw-gradient-stops)), radial-gradient(235% 80% at 100% 115%, var(--tw-gradient-stops))",
+        "app-login-radial":
+          "radial-gradient(345% 170% at 0% 0%, var(--tw-gradient-stops)), radial-gradient(260% 170% at 100% 115%, var(--tw-gradient-stops))",
       },
     },
   },

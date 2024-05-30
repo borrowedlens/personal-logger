@@ -12,7 +12,7 @@ import { type BaseResponseSchema } from "~/models/Person";
 import { ENV } from "~/lib/constants";
 import { EventDetailSchema, UpdateEventSchema } from "~/models/Event";
 import { format } from "date-fns";
-import { SecondarySSR } from "~/components/ssr-links/secondary-ssr";
+import { SecondarySSRLink } from "~/components/ssr-links/secondary-ssr";
 import { PrimaryButton } from "~/components/button/primary-button";
 
 export const useEventDetails = routeLoader$<
@@ -54,7 +54,6 @@ export const useUpdateEvent = routeAction$(
     { request, params },
   ) => {
     const eventId = params.eventId || "";
-    console.log("🚀 ~ eventDescription:", eventDescription);
     const stringifiedBody = JSON.stringify({
       eventName,
       eventDescription,
@@ -79,6 +78,7 @@ export const useUpdateEvent = routeAction$(
 
 export default component$(() => {
   const event = useEventDetails();
+  console.log("🚀 ~ event:", event.value.data);
   const location = useLocation();
   const inEditMode = location.url.searchParams.get("edit") === "true";
 
@@ -115,7 +115,7 @@ export default component$(() => {
           isRecurring={event.value.data.isRecurring}
         />
         <fieldset class="mt-2 flex items-center justify-between">
-          <SecondarySSR href="/dashboard">Back</SecondarySSR>
+          <SecondarySSRLink href="/dashboard">Back</SecondarySSRLink>
           <PrimaryButton>Save Changes</PrimaryButton>
         </fieldset>
       </Form>

@@ -1,5 +1,5 @@
 import {
-  // $,
+  $,
   component$,
   useComputed$,
   useSignal,
@@ -14,16 +14,16 @@ import {
   zod$,
 } from "@builder.io/qwik-city";
 import { toast } from "qwik-sonner";
-// import { OutlineButton } from "~/components/button/outline-button";
+import { OutlineButton } from "~/components/button/outline-button";
 import { PrimaryButton } from "~/components/button/primary-button";
 import { CustomInput } from "~/components/input/custom-input";
 import { CustomSelect } from "~/components/select/custom-select";
-import { SecondarySSR } from "~/components/ssr-links/secondary-ssr";
+import { SecondarySSRLink } from "~/components/ssr-links/secondary-ssr";
 import { type BaseResponseSchema, PeopleSchema } from "~/models/Person";
 import { ENV } from "~/lib/constants";
-// import { setSearchParam } from "~/lib/utils";
+import { setSearchParam } from "~/lib/utils";
 import { AddEventSchema } from "~/models/Event";
-import { OutlineSSR } from "~/components/ssr-links/outline-ssr";
+// import { OutlineSSR } from "~/components/ssr-links/outline-ssr";
 
 export const usePeople = routeLoader$<
   BaseResponseSchema<z.infer<typeof PeopleSchema>>
@@ -61,6 +61,7 @@ export const useAddEvent = routeAction$(
     { eventName, eventDescription, eventDate, personId, ...optionals },
     { request },
   ) => {
+    console.log("🚀 ~ eventDate:", eventDate)
     const stringifiedBody = JSON.stringify({
       eventName,
       eventDescription,
@@ -107,15 +108,15 @@ export default component$(() => {
     }
   });
 
-  // const handleNavigation = $(() => {
-  //   const currentFormData = new FormData(formRef.value);
-  //   const navigationUrl = new URL(`${ENV.PUBLIC_UI_URL}/dashboard/person`);
-  //   setSearchParam(navigationUrl, currentFormData, "eventName");
-  //   setSearchParam(navigationUrl, currentFormData, "eventDate");
-  //   setSearchParam(navigationUrl, currentFormData, "isRecurring");
-  //   setSearchParam(navigationUrl, currentFormData, "eventDescription");
-  //   navigate(navigationUrl.toString());
-  // });
+  const handleNavigation = $(() => {
+    const currentFormData = new FormData(formRef.value);
+    const navigationUrl = new URL(`${ENV.PUBLIC_UI_URL}/dashboard/person`);
+    setSearchParam(navigationUrl, currentFormData, "eventName");
+    setSearchParam(navigationUrl, currentFormData, "eventDate");
+    setSearchParam(navigationUrl, currentFormData, "isRecurring");
+    setSearchParam(navigationUrl, currentFormData, "eventDescription");
+    navigate(navigationUrl.toString());
+  });
 
   return (
     <>
@@ -156,13 +157,13 @@ export default component$(() => {
           >
             Friend*
           </label>
-          <OutlineSSR
+          <OutlineButton
             class="text-right text-xs"
             type="button"
-            href="/dashboard/person"
+            onClick$={handleNavigation}
           >
             Add Friend
-          </OutlineSSR>
+          </OutlineButton>
           <CustomSelect
             class="col-span-2"
             id="personId"
@@ -185,7 +186,7 @@ export default component$(() => {
           )}
         </label>
         <fieldset class="mt-2 flex items-center justify-between">
-          <SecondarySSR href="/dashboard">Back</SecondarySSR>
+          <SecondarySSRLink href="/dashboard">Back</SecondarySSRLink>
           <PrimaryButton>Add Event</PrimaryButton>
         </fieldset>
       </Form>

@@ -1,5 +1,5 @@
 import { component$, useComputed$ } from "@builder.io/qwik";
-import { differenceInCalendarDays, format } from "date-fns";
+import { format } from "date-fns";
 import { type z } from "@builder.io/qwik-city";
 import { BsPencilFill } from "@qwikest/icons/bootstrap";
 import { BsTrash3Fill } from "@qwikest/icons/bootstrap";
@@ -7,7 +7,7 @@ import { OutlineButton } from "../button/outline-button";
 import { DaysLabel } from "../labels/days-label";
 // import { OutlineSSR } from "../ssr-links/outline-ssr";
 import { type UpcomingEventResponseSchema } from "~/models/Event";
-import { OutlineCSR } from "../csr-links/outline-csr";
+import { OutlineCSRLink } from "../csr-links/outline-csr";
 
 interface EventCardProps
   extends Omit<
@@ -24,10 +24,6 @@ export const EventCard = component$(
     firstName,
     lastName,
   }: EventCardProps) => {
-    const nextEventCountdown = useComputed$(() => {
-      return differenceInCalendarDays(upcomingDate, new Date());
-    });
-
     const displayedName = useComputed$(() => {
       if (nickName) {
         return `${nickName}'s`;
@@ -47,17 +43,17 @@ export const EventCard = component$(
           </div>
           <div class="flex items-center justify-start gap-x-1 text-left">
             <span class="text-right">{format(upcomingDate, "do LLL")}</span>
-            <DaysLabel daysRemaining={nextEventCountdown.value} />
+            <DaysLabel upcomingDate={upcomingDate} />
           </div>
         </div>
-        <div class="row-span-2 flex items-center gap-x-1">
-          <OutlineCSR
+        <div class="row-span-2 flex items-center">
+          <OutlineCSRLink
             href={`/dashboard/event/${id}?edit=true`}
-            class="p-1 text-havelock-blue-400 hover:text-havelock-blue-800"
+            class="p-1 text-sm md:p-2"
           >
             <BsPencilFill />
-          </OutlineCSR>
-          <OutlineButton class="p-1 text-havelock-blue-400 hover:text-havelock-blue-800 md:p-1">
+          </OutlineCSRLink>
+          <OutlineButton class="p-1 text-sm md:p-2">
             <BsTrash3Fill />
           </OutlineButton>
         </div>

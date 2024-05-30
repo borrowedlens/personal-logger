@@ -8,7 +8,7 @@ export const OutlineButton = component$<
   return (
     <button
       class={cn(
-        "rounded-md text-havelock-blue-700 hover:text-havelock-blue-800",
+        "ring-offset-background focus-visible:ring-ring rounded-lg text-havelock-blue-700 transition-colors hover:bg-havelock-blue-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
         className,
       )}
       {...props}

@@ -1,5 +1,5 @@
 import { z } from "@builder.io/qwik-city";
-import { AddEventSchema, EventsSchema, UpcomingEventResponseSchema } from "./Event";
+import { AddEventSchema, UpcomingEventResponseSchema } from "./Event";
 
 export interface BaseResponseSchema<T> {
   success: boolean;
@@ -8,26 +8,14 @@ export interface BaseResponseSchema<T> {
   data: T | null;
 }
 
-export const UserProfileSchema = z.object({
-  id: z.number(),
-  firstName: z.string(),
-  lastName: z.string(),
-  dob: z.coerce.date(),
-  phone: z.string(),
-  events: EventsSchema,
-  email: z.string().email(),
-  createdAt: z.coerce.date(),
-  updatedAt: z.coerce.date(),
-});
-
-
 export const PersonProfileSchema = z.object({
   id: z.number().optional(),
   firstName: z.string(),
   lastName: z.string(),
-  nickName: z.string(),
-  dob: z.coerce.date(),
-  phone: z.string(),
+  nickName: z.string().optional(),
+  dob: z.string(),
+  phone: z.string().optional(),
+  notes: z.string().optional(),
   email: z.string().email(),
   events: z.array(AddEventSchema).optional(),
 });

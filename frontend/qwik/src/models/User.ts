@@ -1,26 +1,14 @@
 import { z } from "@builder.io/qwik-city";
+import { EventsSchema } from "./Event";
 
-export const SignupSchema = z
-  .object({
-    firstName: z.string(),
-    lastName: z.string(),
-    email: z.string().email(),
-    phone: z.union([z.string().optional(), z.string().length(10)]),
-    password: z.string().min(8),
-    confirmPassword: z.string().min(8),
-    dob: z.coerce.date(),
-  })
-  .refine(
-    (values) => {
-      return values.password === values.confirmPassword;
-    },
-    {
-      message: "Passwords do not match",
-      path: ["confirmPassword"],
-    },
-  );
-
-export const LoginSchema = z.object({
+export const UserProfileSchema = z.object({
+  id: z.number(),
+  firstName: z.string(),
+  lastName: z.string(),
+  dob: z.coerce.date(),
+  phone: z.string(),
+  events: EventsSchema,
   email: z.string().email(),
-  password: z.string().min(8),
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
 });

@@ -1,8 +1,10 @@
 import { $, component$, useComputed$, useSignal } from "@builder.io/qwik";
 import {
+  addDays,
   addMonths,
   endOfMonth,
   format,
+  getDate,
   getDay,
   getDaysInMonth,
   startOfMonth,
@@ -12,22 +14,30 @@ import { BsArrowRightShort, BsArrowLeftShort } from "@qwikest/icons/bootstrap";
 import { OutlineButton } from "../button/outline-button";
 import { cn } from "~/lib/utils";
 
-export const Calendar = component$(() => {
+interface CalendarProps {
+  upcomingDates: Array<string>;
+}
+
+export const Calendar = component$(({ upcomingDates }: CalendarProps) => {
   const displayedMonth = useSignal(new Date());
 
   const arrayOfDaysInMonth = useComputed$(() => {
-    const firstDay = getDay(startOfMonth(displayedMonth.value));
-    const lastDay = getDay(endOfMonth(displayedMonth.value));
+    const start = startOfMonth(displayedMonth.value);
+    const end = endOfMonth(displayedMonth.value);
+    const firstDay = getDay(start);
+    const lastDay = getDay(end);
     const nullBoxesInBeginning = firstDay;
     const nullBoxesInEnd = 6 - lastDay;
     const daysInMonth = getDaysInMonth(displayedMonth.value);
-    const datesArray: Array<number | boolean> = Array.from({
+    const datesArray: Array<Date | null> = Array.from({
       length: daysInMonth,
-    }).map((_, index) => index + 1);
+    }).map((_, index) => {
+      return addDays(startOfMonth(displayedMonth.value), index);
+    });
     datesArray.unshift(
-      ...Array.from({ length: nullBoxesInBeginning }).map(() => false),
+      ...Array.from({ length: nullBoxesInBeginning }).map(() => null),
     );
-    datesArray.push(...Array.from({ length: nullBoxesInEnd }).map(() => false));
+    datesArray.push(...Array.from({ length: nullBoxesInEnd }).map(() => null));
     return datesArray;
   });
 
@@ -61,9 +71,11 @@ export const Calendar = component$(() => {
             key={index}
             class={cn("grid h-5 w-5 place-items-center rounded-sm", {
               "bg-white": date,
+              "bg-havelock-blue-400":
+                date && upcomingDates.includes(format(date, "dd-MM")),
             })}
           >
-            {date}
+            {date ? getDate(date) : ""}
           </span>
         ))}
       </div>

@@ -1,32 +1,17 @@
 import { Slot, component$ } from "@builder.io/qwik";
-import {
-  type RequestHandler,
-  routeLoader$,
-  useLocation,
-} from "@builder.io/qwik-city";
+import { routeLoader$, useLocation } from "@builder.io/qwik-city";
 import { z } from "@builder.io/qwik-city";
 import { BsPlusSquareFill } from "@qwikest/icons/bootstrap";
 
 import { Calendar } from "~/components/calendar/calendar";
 import { EventCard } from "~/components/cards/event-card";
 import { Header } from "~/components/header/header";
-import { OutlineSSR } from "~/components/ssr-links/outline-ssr";
+import { OutlineSSRLink } from "~/components/ssr-links/outline-ssr";
 import { type BaseResponseSchema } from "~/models/Person";
 import { ENV } from "~/lib/constants";
 import { cn } from "~/lib/utils";
 import { UpcomingEventsSchema } from "~/models/Event";
-
-export const onGet: RequestHandler = async ({ request, redirect }) => {
-  const res = await fetch(`${ENV.PUBLIC_API_URL}/auth`, {
-    method: "GET",
-    headers: request.headers,
-  });
-  if (!res.ok) {
-    if (res.status === 401) {
-      throw redirect(302, "/");
-    }
-  }
-};
+import { format } from "date-fns";
 
 export const useEvents = routeLoader$<
   BaseResponseSchema<z.infer<typeof UpcomingEventsSchema>>
@@ -68,71 +53,85 @@ export default component$(() => {
   return (
     <>
       <Header />
-      <main class="grid h-full w-full grid-rows-[auto_1fr] gap-3 bg-app-linear-gradient from-havelock-blue-100 from-50% to-white p-3 sm:grid-cols-[30%_auto_30%] md:gap-6 md:p-6 md:pt-20">
-        <section
-          class={cn("hidden flex-col gap-y-3 rounded-lg bg-white p-4 sm:flex", {
+      <main class="grid min-h-full w-full gap-3 bg-app-linear-gradient from-havelock-blue-100 from-50% to-white p-3 pt-20 md:h-full md:grid-cols-[1fr_1fr] md:gap-6 md:p-6 md:pt-20 lg:grid-cols-[30%_auto_30%]">
+        <div
+          class={cn("hidden min-h-0 flex-col justify-between gap-y-3 md:flex", {
             flex: location.url.pathname === "/dashboard/",
           })}
         >
-          <Calendar />
-        </section>
+          <div class="flex flex-col gap-y-3 rounded-lg bg-white p-4">
+            <Calendar
+              upcomingDates={
+                events.value.data
+                  ? events.value.data.map((event) =>
+                      format(event.upcomingDate, "dd-MM"),
+                    )
+                  : []
+              }
+            />
+          </div>
+          <section
+            class={cn(
+              "hidden min-h-0 flex-col gap-y-2 rounded-lg bg-white p-2 md:flex md:p-3",
+              {
+                flex: location.url.pathname === "/dashboard/",
+              },
+            )}
+          >
+            <h2 class="flex items-center justify-between text-base md:text-lg">
+              <span>Your upcoming events</span>
+              <OutlineSSRLink href="/dashboard/event" class="p-1">
+                <BsPlusSquareFill />
+              </OutlineSSRLink>
+            </h2>
+            <div class="flex flex-col overflow-y-auto py-2">
+              {events.value.success ? (
+                events.value.data?.map(
+                  ({
+                    id,
+                    eventName,
+                    upcomingDate,
+                    nickName,
+                    firstName,
+                    lastName,
+                  }) => (
+                    <EventCard
+                      key={id}
+                      id={id}
+                      eventName={eventName}
+                      upcomingDate={upcomingDate}
+                      nickName={nickName}
+                      firstName={firstName}
+                      lastName={lastName}
+                    />
+                  ),
+                )
+              ) : (
+                <span>{events.value.errorMessage}</span>
+              )}
+            </div>
+          </section>
+        </div>
         <section
           class={cn(
-            "row-span-2 flex flex-col gap-y-2 overflow-y-auto rounded-lg bg-white p-4",
+            "flex flex-col gap-y-2 overflow-y-auto rounded-lg bg-white p-4",
             {
-              "hidden sm:block": location.url.pathname === "/dashboard/",
+              "hidden lg:block": location.url.pathname === "/dashboard/",
             },
           )}
         >
           <Slot />
         </section>
         <section
-          class={cn("row-span-2 overflow-y-auto rounded-lg bg-white p-4", {
-            "hidden sm:block": location.url.pathname === "/dashboard/",
-          })}
-        >
-          <div>Dummy div</div>
-        </section>
-        <section
           class={cn(
-            "hidden min-h-0 flex-col gap-y-2 rounded-lg bg-white p-2 sm:flex md:p-3",
+            "min-h-0 flex-col gap-y-2 overflow-y-auto rounded-lg bg-white p-4",
             {
-              flex: location.url.pathname === "/dashboard/",
+              "hidden lg:flex": location.url.pathname !== "/dashboard/",
             },
           )}
         >
-          <h2 class="flex items-center justify-between text-base md:text-lg">
-            <span>Your upcoming events</span>
-            <OutlineSSR href="/dashboard/event" class="p-1">
-              <BsPlusSquareFill />
-            </OutlineSSR>
-          </h2>
-          <div class="flex flex-col overflow-y-auto py-2">
-            {events.value.success ? (
-              events.value.data?.map(
-                ({
-                  id,
-                  eventName,
-                  upcomingDate,
-                  nickName,
-                  firstName,
-                  lastName,
-                }) => (
-                  <EventCard
-                    key={id}
-                    id={id}
-                    eventName={eventName}
-                    upcomingDate={upcomingDate}
-                    nickName={nickName}
-                    firstName={firstName}
-                    lastName={lastName}
-                  />
-                ),
-              )
-            ) : (
-              <span>{events.value.errorMessage}</span>
-            )}
-          </div>
+          <h2 class="text-base md:text-lg">Tasks</h2>
+          <div>Coming soon!</div>
         </section>
       </main>
     </>

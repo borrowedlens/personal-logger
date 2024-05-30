@@ -1,11 +1,13 @@
 import { component$ } from "@builder.io/qwik";
+import { differenceInCalendarDays } from "date-fns";
 import { cn } from "~/lib/utils";
 
 interface DaysLabelProps {
-  daysRemaining: number;
+  upcomingDate: Date;
 }
 
-export const DaysLabel = component$(({ daysRemaining }: DaysLabelProps) => {
+export const DaysLabel = component$(({ upcomingDate }: DaysLabelProps) => {
+  const daysRemaining = differenceInCalendarDays(upcomingDate, new Date());
   return (
     <span
       class={cn("rounded-md px-1 text-right text-xs", {

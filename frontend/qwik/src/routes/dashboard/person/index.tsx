@@ -10,7 +10,7 @@ import { PrimaryButton } from "~/components/button/primary-button";
 import { SecondaryButton } from "~/components/button/secondary-button";
 import { EventInput } from "~/components/event-input/event-input";
 import { CustomInput } from "~/components/input/custom-input";
-import { SecondarySSR } from "~/components/ssr-links/secondary-ssr";
+import { SecondarySSRLink } from "~/components/ssr-links/secondary-ssr";
 import { PersonProfileSchema } from "~/models/Person";
 import { ENV } from "~/lib/constants";
 
@@ -22,11 +22,15 @@ export const useAddPerson = routeAction$(
     const reqBody: z.infer<typeof PersonProfileSchema> = {
       firstName,
       lastName,
-      nickName,
-      dob,
-      phone,
       email,
+      dob,
     };
+    if (nickName) {
+      reqBody.nickName = nickName;
+    }
+    if (phone) {
+      reqBody.phone = phone;
+    }
     if (events) {
       reqBody.events = [
         ...events.map((event) => ({
@@ -56,7 +60,6 @@ export default component$(() => {
   const location = useLocation();
   const searchParams = location.url.searchParams;
   const eventName = searchParams.get("eventName") || "";
-  console.log("🚀 ~ eventName:", eventName)
   const eventDate = searchParams.get("eventDate") || "";
   const eventIsRecurring = searchParams.get("isRecurring") || "";
   const eventDescription = searchParams.get("eventDescription") || "";
@@ -91,7 +94,7 @@ export default component$(() => {
             <CustomInput name="nickName"></CustomInput>
           </label>
           <label class="flex w-full flex-col gap-y-1 text-xs text-slate-800">
-            Date of Birth*
+            Date of Birth
             <CustomInput name="dob" type="date"></CustomInput>
           </label>
         </fieldset>
@@ -137,7 +140,7 @@ export default component$(() => {
           </SecondaryButton>
         </fieldset>
         <fieldset class="sticky bottom-0 left-0 mt-2 flex items-center justify-between bg-white pt-2">
-          <SecondarySSR href={`/dashboard/event`}>Back</SecondarySSR>
+          <SecondarySSRLink href={`/dashboard/event`}>Back</SecondarySSRLink>
           <PrimaryButton>Add Friend</PrimaryButton>
         </fieldset>
       </Form>

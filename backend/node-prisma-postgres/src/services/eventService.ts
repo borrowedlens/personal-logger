@@ -58,6 +58,7 @@ export const getUpcomingEventsService = async ({
         FROM eventsschema.events LEFT JOIN eventsschema.people ON people.id = events."personId") AS upcomingEvents
     WHERE "upcomingDate" >= now() AND "userId" = ${userId}
     ORDER BY "upcomingDate" ASC;`;
+  console.log("🚀 ~ events: upcoming", events);
   return events;
 };
 

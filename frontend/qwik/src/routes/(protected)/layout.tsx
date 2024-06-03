@@ -51,6 +51,7 @@ export const usePeopleLoader = routeLoader$<
     method: "GET",
     headers: requestEvent.request.headers,
   });
+  console.log("🚀 ~ > ~ res:people", res);
   if (!res.ok) {
     return requestEvent.fail(res.status, {
       data: [],
@@ -61,6 +62,7 @@ export const usePeopleLoader = routeLoader$<
     });
   }
   const { data } = await res.json();
+  console.log("🚀 ~ > ~ data:people", data);
   try {
     GetPeopleSchema.parse(data.people);
   } catch (err) {
@@ -84,6 +86,7 @@ export const useUpcomingEventsLoader = routeLoader$<
     method: "GET",
     headers: requestEvent.request.headers,
   });
+  console.log("🚀 ~ > ~ res:upcomingEvents", res);
   if (!res.ok) {
     return requestEvent.fail(res.status, {
       data: [],
@@ -94,16 +97,8 @@ export const useUpcomingEventsLoader = routeLoader$<
     });
   }
 
-  for (const [key, value] of res.headers.entries()) {
-    if (
-      key === "access-control-allow-origin" ||
-      key === "access-control-allow-credentials"
-    ) {
-      requestEvent.headers.set(key, value);
-    }
-  }
-
   const { data } = await res.json();
+  console.log("🚀 ~ > ~ data:upcomingEvents", data);
   try {
     UpcomingEventsSchema.parse(data.events);
   } catch (err) {

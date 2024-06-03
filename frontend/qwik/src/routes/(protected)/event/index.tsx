@@ -5,7 +5,13 @@ import {
   useSignal,
   useTask$,
 } from "@builder.io/qwik";
-import { Form, routeAction$, useNavigate, zod$ } from "@builder.io/qwik-city";
+import {
+  Form,
+  routeAction$,
+  useLocation,
+  useNavigate,
+  zod$,
+} from "@builder.io/qwik-city";
 import { toast } from "qwik-sonner";
 import { OutlineButton } from "~/components/button/outline-button";
 import { PrimaryButton } from "~/components/button/primary-button";
@@ -61,6 +67,7 @@ export default component$(() => {
   );
 
   const navigate = useNavigate();
+  const { url } = useLocation();
 
   const action = useAddEvent();
 
@@ -74,7 +81,7 @@ export default component$(() => {
 
   const handleNavigation = $(() => {
     const currentFormData = new FormData(formRef.value);
-    const navigationUrl = new URL(`${ENV.PUBLIC_UI_URL}/person`);
+    const navigationUrl = new URL(`${url.origin}/friends`);
     setSearchParam(navigationUrl, currentFormData, "eventName");
     setSearchParam(navigationUrl, currentFormData, "eventDate");
     setSearchParam(navigationUrl, currentFormData, "isRecurring");

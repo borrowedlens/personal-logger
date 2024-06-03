@@ -92,6 +92,7 @@ export const getPersonService = async ({
           id: true,
           eventDate: true,
           eventName: true,
+          isRecurring: true,
         },
       },
     },

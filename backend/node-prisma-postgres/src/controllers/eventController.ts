@@ -1,6 +1,7 @@
 import { RequestHandler } from "express";
 import {
   addEventService,
+  getAllEventsService,
   getEventDetailsService,
   getUpcomingEventsService,
   updateEventService,
@@ -91,6 +92,23 @@ export const updateEvent: RequestHandler = async (req, res, next) => {
       },
       errorCode: 0,
       errorMessage: "",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getAllEvents: RequestHandler = async (req, res, next) => {
+  try {
+    const userId = req.session.user!;
+    const events = await getAllEventsService({ userId });
+    res.status(200).json({
+      errorCode: 0,
+      errorMessage: "",
+      success: true,
+      data: {
+        events,
+      },
     });
   } catch (error) {
     next(error);

@@ -80,7 +80,6 @@ export const login: RequestHandler = async (req, res, next) => {
 };
 
 export const checkAuthentication: RequestHandler = (req, res, next) => {
-  console.log("🚀 ~ req.session:", req.session);
   try {
     if (!req.session.user) {
       throw new GlobalError("Session expired/is invalid", 401);
@@ -98,7 +97,6 @@ export const checkAuthentication: RequestHandler = (req, res, next) => {
 
 export const logout: RequestHandler = (req, res) => {
   req.session.destroy(() => {
-    console.log("after destroy", req.session, req.session?.user);
     res.clearCookie("connect.sid").status(200).json({
       success: true,
       errorCode: 0,

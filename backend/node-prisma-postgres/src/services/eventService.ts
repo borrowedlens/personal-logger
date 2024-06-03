@@ -7,6 +7,33 @@ import {
 } from "../models/eventModels";
 import { UserSpecificSchema } from "../models/userModels";
 
+export const getAllEventsService = async ({
+  userId,
+}: z.infer<typeof UserSpecificSchema>) => {
+  const events = await prismaClient.event.findMany({
+    where: {
+      userId,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+    select: {
+      id: true,
+      eventName: true,
+      eventDate: true,
+      isRecurring: true,
+      person: {
+        select: {
+          firstName: true,
+          lastName: true,
+          nickName: true,
+        },
+      },
+    },
+  });
+  return events;
+};
+
 export const getUpcomingEventsService = async ({
   userId,
 }: z.infer<typeof UserSpecificSchema>) => {
@@ -46,13 +73,18 @@ export const getEventDetailsService = async ({
         userId: userId,
       },
     },
-    include: {
+    select: {
+      eventName: true,
+      eventDate: true,
+      isRecurring: true,
       person: {
         select: {
           id: true,
           firstName: true,
           lastName: true,
           nickName: true,
+          email: true,
+          phone: true,
         },
       },
     },

@@ -7,6 +7,7 @@ import {
 } from "./controllers/personController";
 import {
   createEvent,
+  getAllEvents,
   getEventDetails,
   getUpcomingEvents,
   updateEvent,
@@ -42,7 +43,8 @@ routes.get("/people", isAuthenticated, getPeople);
 routes.get("/person/:personId", isAuthenticated, getPerson);
 
 //Event routes
-routes.get("/events", isAuthenticated, getUpcomingEvents);
+routes.get("/events/upcoming", isAuthenticated, getUpcomingEvents);
+routes.get("/events/all", isAuthenticated, getAllEvents);
 routes.get("/event/:eventId", isAuthenticated, getEventDetails);
 routes.post("/event", isAuthenticated, createEvent);
 routes.patch("/event/:eventId", isAuthenticated, updateEvent);

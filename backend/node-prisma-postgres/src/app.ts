@@ -15,7 +15,7 @@ app.use(
   cors({
     credentials: true,
     origin: ["http://localhost:5173", "https://personal-logger.pages.dev"],
-    methods: ["POST", "PUT", "GET", "OPTIONS", "HEAD"],
+    methods: ["POST", "PUT", "GET", "OPTIONS", "HEAD", "PATCH", "DELETE"],
   })
 );
 

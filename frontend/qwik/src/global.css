@@ -8,13 +8,6 @@
 
 @layer base {
   @font-face {
-    font-family: "Inter";
-    font-style: normal;
-    font-weight: 400;
-    font-display: swap;
-    src: url("/fonts/Inter-Regular.ttf") format("truetype");
-  }
-  @font-face {
     font-family: "Poppins";
     font-style: normal;
     font-weight: 400;
@@ -27,13 +20,6 @@
     font-weight: 400;
     font-display: swap;
     src: url("/fonts/Poppins-Bold.ttf") format("truetype");
-  }
-  @font-face {
-    font-family: "InterBold";
-    font-style: normal;
-    font-weight: 700;
-    font-display: swap;
-    src: url("/fonts/Inter-Bold.ttf") format("truetype");
   }
 }
 

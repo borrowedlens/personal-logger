@@ -41,13 +41,17 @@ export const useAddPersonAction = routeAction$(
     }
     const stringifiedBody = JSON.stringify(reqBody);
 
-    request.headers.delete("content-length");
-    request.headers.set("content-type", "application/json");
+    const headers = new Headers();
+    for (const [key, value] of request.headers.entries()) {
+      if (key !== "content-length" && key !== "content-type") {
+        headers.set(key, value);
+      }
+    }
+    headers.set("content-type", "application/json");
 
     const res = await fetch(`${ENV.PUBLIC_API_URL}/person`, {
       method: "POST",
-      headers: request.headers,
-      credentials: "include",
+      headers: headers,
       body: stringifiedBody,
     });
     const data = await res.json();

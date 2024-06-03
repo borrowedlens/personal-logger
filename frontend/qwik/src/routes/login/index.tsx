@@ -19,7 +19,6 @@ export const useLoginAction = routeAction$(
       headers: {
         "Content-Type": "application/json",
       },
-      credentials: "include",
       body: JSON.stringify(user),
     });
     if (!res.ok) {

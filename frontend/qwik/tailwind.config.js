@@ -4,7 +4,6 @@ export default {
   havelockBlue: "selector",
   theme: {
     fontFamily: {
-      inter: "Inter",
       poppins: "Poppins",
     },
     extend: {

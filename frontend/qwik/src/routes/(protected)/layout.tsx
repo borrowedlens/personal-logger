@@ -15,7 +15,6 @@ export const onRequest: RequestHandler = async ({ request, redirect }) => {
   const res = await fetch(`${ENV.PUBLIC_API_URL}/auth`, {
     method: "GET",
     headers: request.headers,
-    credentials: "include",
   });
   if (!res.ok) {
     if (res.status === 401) {
@@ -112,13 +111,18 @@ export const useUpcomingEventsLoader = routeLoader$<
 });
 
 export const useLogoutAction = routeAction$(
-  async (_, { request, headers, redirect }) => {
-    request.headers.delete("content-length");
-    request.headers.set("content-type", "application/json");
+  async (_, { request, redirect }) => {
+    const headers = new Headers();
+    for (const [key, value] of request.headers.entries()) {
+      if (key !== "content-length" && key !== "content-type") {
+        headers.set(key, value);
+      }
+    }
+    headers.set("content-type", "application/json");
+
     const res = await fetch(`${ENV.PUBLIC_API_URL}/logout`, {
       method: "POST",
-      headers: request.headers,
-      credentials: "include",
+      headers: headers,
     });
     for (const [key, value] of res.headers.entries()) {
       headers.set(key, value);

@@ -24,7 +24,6 @@ export const SignupSchema = z
   })
   .refine(
     (values) => {
-      console.log("🚀 ~ values:", values)
       return values.password === values.confirmPassword;
     },
     {
@@ -81,9 +80,8 @@ export default component$(() => {
   const navigate = useNavigate();
 
   useTask$(({ track }) => {
-    const id = track(() => action.value?.data?.id);
-    console.log("🚀 ~ id:", id)
-    if (id) {
+    const success = track(() => action.value?.success);
+    if (success) {
       toast.success(
         "Account created successfully, please login with your credentials",
       );

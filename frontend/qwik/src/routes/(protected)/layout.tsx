@@ -84,9 +84,6 @@ export const useUpcomingEventsLoader = routeLoader$<
     method: "GET",
     headers: requestEvent.request.headers,
   });
-  console.log("🚀 ~ > ~ res:upcomingEvents", res.statusText);
-  console.log("🚀 ~ > ~ res:upcomingEvents", res.body);
-  console.log("🚀 ~ > ~ res:upcomingEvents", res.text);
   if (!res.ok) {
     return requestEvent.fail(res.status, {
       data: [],
@@ -98,7 +95,6 @@ export const useUpcomingEventsLoader = routeLoader$<
   }
 
   const { data } = await res.json();
-  console.log("🚀 ~ > ~ data:upcomingEvents", data);
   try {
     UpcomingEventsSchema.parse(data.events);
   } catch (err) {

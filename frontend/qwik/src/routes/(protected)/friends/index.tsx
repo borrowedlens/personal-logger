@@ -1,4 +1,4 @@
-import { component$, useStore } from "@builder.io/qwik";
+import { component$, useSignal, useStore, useTask$ } from "@builder.io/qwik";
 import {
   Form,
   routeAction$,
@@ -6,6 +6,7 @@ import {
   type z,
   zod$,
 } from "@builder.io/qwik-city";
+import { toast } from "qwik-sonner";
 import { PrimaryButton } from "~/components/button/primary-button";
 import { SecondaryButton } from "~/components/button/secondary-button";
 import { EventInput } from "~/components/event-input/event-input";
@@ -54,13 +55,15 @@ export const useAddPersonAction = routeAction$(
       headers: headers,
       body: stringifiedBody,
     });
-    const data = await res.json();
-    return { success: true, id: data.data.personId };
+    const { data } = await res.json();
+    return { success: true, id: data.personId };
   },
   zod$(PersonProfileSchema),
 );
 
 export default component$(() => {
+  const formRef = useSignal<HTMLFormElement>();
+
   const location = useLocation();
   const searchParams = location.url.searchParams;
   const eventName = searchParams.get("eventName") || "";
@@ -75,12 +78,23 @@ export default component$(() => {
 
   const action = useAddPersonAction();
 
+  useTask$(({ track }) => {
+    const success = track(() => action.value?.success);
+    if (success) {
+      toast.success("Friend added successfully!");
+      if (formRef.value) {
+        formRef.value.reset();
+      }
+    }
+  });
+
   return (
     <section class="flex h-full flex-col gap-y-4 rounded-lg bg-white p-2 text-slate-900 lg:flex-1 lg:p-3">
       <h2 class="md:text-lg" id="add-friend">
         Add Friend
       </h2>
       <Form
+        ref={formRef}
         class="relative grid h-full content-start gap-y-6 overflow-y-auto px-2"
         action={action}
       >

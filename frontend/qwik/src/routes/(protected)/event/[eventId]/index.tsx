@@ -14,7 +14,7 @@ export const EventDetailSchema = z.object({
     .object({
       firstName: z.string(),
       lastName: z.string(),
-      nickName: z.string(),
+      nickName: z.string().nullable(),
       email: z.string(),
       phone: z.string().nullable(),
     })

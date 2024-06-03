@@ -57,7 +57,7 @@ export default component$(() => {
         >
           <label class="flex w-full flex-col gap-y-1 text-sm text-slate-800">
             Email
-            <CustomInput name="email"></CustomInput>
+            <CustomInput name="email" value="vivek@test.com"></CustomInput>
             {action.value?.failed && (
               <span class="text-burnt-umber-700">
                 {action.value.fieldErrors?.email}
@@ -66,7 +66,7 @@ export default component$(() => {
           </label>
           <label class="flex w-full flex-col gap-y-1 text-sm text-slate-800">
             Password
-            <CustomInput type="password" name="password"></CustomInput>
+            <CustomInput type="password" name="password" value="Hello12345"></CustomInput>
             {action.value?.failed && (
               <span class="text-burnt-umber-700">
                 {action.value.fieldErrors?.password}

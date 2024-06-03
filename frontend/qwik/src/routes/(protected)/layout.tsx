@@ -27,7 +27,7 @@ export const PersonSchema = z.object({
   id: z.number().optional(),
   firstName: z.string(),
   lastName: z.string(),
-  nickName: z.string().optional(),
+  nickName: z.string().nullable(),
   phone: z.string().optional().nullable(),
   email: z.string().email(),
   events: z

@@ -67,7 +67,7 @@ export const PersonCard = component$(
         <div class="flex w-full justify-between gap-x-1">
           <div class="flex items-center justify-start gap-x-1 text-left">
             <span>{fullName.value}</span>
-            <span>{`(${nickName})`}</span>
+            {nickName ? <span>{`(${nickName})`}</span> : null}
           </div>
           <div class="flex items-center">
             <OutlineButton class="p-1 text-sm lg:p-2">
@@ -116,7 +116,7 @@ export const PersonDetails = component$(() => {
           {fullName.value}
         </span>
       </div>
-      <div class="flex h-full flex-col items-start gap-y-6 pt-60 font-inter">
+      <div class="font-inter flex h-full flex-col items-start gap-y-6 pt-60">
         <label class="flex flex-col items-start gap-y-1 text-left text-xs text-slate-600 sm:text-base">
           Email
           <span class="text-sm text-black sm:text-lg">{email}</span>

@@ -14,7 +14,7 @@ export const AllEventsSchema = z.array(
       .object({
         firstName: z.string(),
         lastName: z.string(),
-        nickName: z.string(),
+        nickName: z.string().nullable(),
       })
       .nullable(),
   }),

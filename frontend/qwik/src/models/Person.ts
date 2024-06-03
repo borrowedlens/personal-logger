@@ -6,7 +6,7 @@ export const PersonProfileSchema = z.object({
   firstName: z.string(),
   lastName: z.string(),
   nickName: z.string().optional(),
-  dob: z.string(),
+  dob: z.union([z.coerce.date(), z.string().length(0)]),
   phone: z.string().optional().nullable(),
   email: z.string().email(),
   events: z.array(AddEventSchema).optional(),

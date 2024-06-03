@@ -8,7 +8,7 @@ export const PersonSchema = z.object({
   nickName: z.string().optional(),
   email: z.string().email(),
   phone: z.string().optional(),
-  dob: z.string(),
+  dob: z.union([z.coerce.date(), z.string().length(0)]),
   notes: z.string().optional(),
   events: z.array(EventSchema).optional(),
 });

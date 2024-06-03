@@ -32,7 +32,7 @@ export const useDayTasksLoader = routeLoader$<
     method: "GET",
     headers: request.headers,
   });
-  console.log("🚀 ~ > ~ res:task", res);
+  console.dir("🚀 ~ > ~ res:task", res);
   if (!res.ok) {
     return fail(res.status, {
       data: [],
@@ -43,7 +43,6 @@ export const useDayTasksLoader = routeLoader$<
     });
   }
   const { data } = await res.json();
-  console.log("🚀 ~ > ~ data:task", data);
   try {
     TasksSchema.parse(data.tasks);
   } catch (err) {
@@ -67,7 +66,7 @@ export const useBacklogTasksLoader = routeLoader$<
     method: "GET",
     headers: request.headers,
   });
-  console.log("🚀 ~ > ~ res:backlog", res);
+  console.dir("🚀 ~ > ~ res:backlog", res);
   if (!res.ok) {
     return fail(res.status, {
       data: [],

@@ -98,13 +98,18 @@ export const useCreateTaskAction = routeAction$(
       date: date,
     });
 
-    request.headers.delete("content-length");
-    request.headers.set("content-type", "application/json");
+    const headers = new Headers();
+    for (const [key, value] of request.headers.entries()) {
+      if (key !== "content-length" && key !== "content-type") {
+        headers.set(key, value);
+      }
+    }
+    headers.set("content-type", "application/json");
 
     const res = await fetch(`${ENV.PUBLIC_API_URL}/task`, {
       method: "POST",
       body: stringifiedBody,
-      headers: request.headers,
+      headers: headers,
     });
     if (!res.ok) {
       return fail(res.status, {
@@ -141,13 +146,18 @@ export const useUpdateTaskAction = routeAction$(
       complete,
     });
 
-    request.headers.delete("content-length");
-    request.headers.set("content-type", "application/json");
+    const headers = new Headers();
+    for (const [key, value] of request.headers.entries()) {
+      if (key !== "content-length" && key !== "content-type") {
+        headers.set(key, value);
+      }
+    }
+    headers.set("content-type", "application/json");
 
     const res = await fetch(`${ENV.PUBLIC_API_URL}/task`, {
       method: "PATCH",
       body: stringifiedBody,
-      headers: request.headers,
+      headers: headers,
     });
     if (!res.ok) {
       return fail(res.status, {
@@ -174,12 +184,17 @@ const DeleteTaskSchema = z.object({
 
 export const useDeleteTaskAction = routeAction$(
   async ({ id }, { request, fail }) => {
-    request.headers.delete("content-length");
-    request.headers.set("content-type", "application/json");
+    const headers = new Headers();
+    for (const [key, value] of request.headers.entries()) {
+      if (key !== "content-length" && key !== "content-type") {
+        headers.set(key, value);
+      }
+    }
+    headers.set("content-type", "application/json");
 
     const res = await fetch(`${ENV.PUBLIC_API_URL}/task/${id}`, {
       method: "DELETE",
-      headers: request.headers,
+      headers: headers,
     });
     if (!res.ok) {
       return fail(res.status, {

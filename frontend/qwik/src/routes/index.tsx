@@ -5,7 +5,6 @@ export const onGet: RequestHandler = async ({ request, redirect }) => {
   const res = await fetch(`${ENV.PUBLIC_API_URL}/auth`, {
     method: "GET",
     headers: request.headers,
-    credentials: "include",
   });
   if (!res.ok) {
     if (res.status === 401) {

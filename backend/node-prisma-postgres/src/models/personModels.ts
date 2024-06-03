@@ -5,10 +5,10 @@ import { UserSpecificSchema } from "./userModels";
 export const PersonSchema = z.object({
   firstName: z.string(),
   lastName: z.string(),
-  nickName: z.string(),
+  nickName: z.string().optional(),
   email: z.string().email(),
-  phone: z.string(),
-  dob: z.coerce.date(),
+  phone: z.string().optional(),
+  dob: z.string(),
   notes: z.string().optional(),
   events: z.array(EventSchema).optional(),
 });

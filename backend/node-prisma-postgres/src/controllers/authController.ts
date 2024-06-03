@@ -10,8 +10,15 @@ export const signup = async (
   next: NextFunction
 ) => {
   try {
-    const { firstName, lastName, email, password, phone, dob } =
-      SignupSchema.parse(req.body);
+    const {
+      firstName,
+      lastName,
+      email,
+      password,
+      confirmPassword,
+      phone,
+      dob,
+    } = SignupSchema.parse(req.body);
     bcrypt.hash(password, 8, async (error, hashedPassword) => {
       if (error) {
         throw new GlobalError("Something went wrong, please try again!", 409);
@@ -72,19 +79,29 @@ export const login: RequestHandler = async (req, res, next) => {
   }
 };
 
-export const checkAuthentication: RequestHandler = (req, res) => {
-  if (!req.session.user) {
-    res.status(401).json({
-      errorCode: 401,
-      errorMessage: "Please login",
-      success: false,
+export const checkAuthentication: RequestHandler = (req, res, next) => {
+  try {
+    if (!req.session.user) {
+      throw new GlobalError("Session expired/is invalid", 401);
+    }
+    res.status(200).json({
+      success: true,
+      errorCode: 0,
+      errorMessage: "",
+      data: req.session.user,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const logout: RequestHandler = (req, res) => {
+  req.session.destroy(() => {
+    res.clearCookie("connect.sid").status(200).json({
+      success: true,
+      errorCode: 0,
+      errorMessage: "",
       data: null,
     });
-  }
-  res.status(200).json({
-    success: true,
-    errorCode: 0,
-    errorMessage: "",
-    data: req.session.user,
   });
 };

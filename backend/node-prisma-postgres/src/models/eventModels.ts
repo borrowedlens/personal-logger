@@ -16,3 +16,11 @@ export const EventSpecificSchema = z.object({
 });
 
 export const EventDetailsSchema = EventSchema.merge(EventSpecificSchema);
+
+export const UpdateEventSchema = EventDetailsSchema.omit({
+  personId: true,
+  eventId: true,
+});
+
+export const UserSpecificUpdateEventSchema =
+  UpdateEventSchema.merge(UserSpecificSchema).merge(EventSpecificSchema);

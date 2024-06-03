@@ -10,7 +10,7 @@ export const signupService = async ({
   password,
   phone,
   dob,
-}: z.infer<typeof SignupSchema>) => {
+}: Omit<z.infer<typeof SignupSchema>, "confirmPassword">) => {
   const { id } = await prismaClient.user.create({
     data: {
       firstName,

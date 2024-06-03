@@ -4,22 +4,10 @@ import { SUPPORTED_THEMES } from "./constants";
 
 export const cn = (...classes: ClassValue[]) => twMerge(clsx(classes));
 
-export const parseCookie = (cookieString: string) => {
-  const cookie = cookieString
-    .split(";")
-    .map((key) => key.split("="))
-    .reduce((acc: Record<string, string>, key: Array<string>) => {
-      console.log("🚀 ~ .reduce ~ key:", key);
-      acc[key[0]] = key[1];
-      return acc;
-    }, {});
-  return cookie;
-};
-
 export const generateThemeClass = (
   theme: string,
   coloringStyle: "bg" | "text",
-  variant: number
+  variant: number,
 ) => {
   return {
     [`${coloringStyle}-${theme}-${variant}`]: true,

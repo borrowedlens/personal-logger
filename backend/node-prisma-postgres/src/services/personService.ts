@@ -17,15 +17,16 @@ export const createPersonService = async ({
   userId,
   events = [],
 }: z.infer<typeof UserSpecificPersonSchema>) => {
-  const eventsData = [
-    {
+  const eventsData = [];
+  if (dob) {
+    eventsData.push({
       eventDate: dob,
       eventDescription: "Big day!",
       eventName: "Birthday",
       isRecurring: true,
       userId,
-    },
-  ];
+    });
+  }
   if (events) {
     eventsData.push(...events.map((event) => ({ userId: userId, ...event })));
   }
@@ -34,9 +35,9 @@ export const createPersonService = async ({
       firstName,
       lastName,
       nickName,
-      dob,
-      phone,
-      notes,
+      dob: !!dob ? dob : null,
+      phone: phone ?? null,
+      notes: notes ?? null,
       user: {
         connect: {
           id: userId,
@@ -58,10 +59,13 @@ export const getPeopleService = async () => {
       firstName: true,
       lastName: true,
       nickName: true,
-      dob: true,
+      email: true,
+      phone: true,
       events: {
         select: {
+          id: true,
           eventDate: true,
+          eventName: true,
         },
       },
     },
@@ -69,15 +73,28 @@ export const getPeopleService = async () => {
   return people;
 };
 
-export const getPersonDetailsService = async ({
+export const getPersonService = async ({
   personId,
 }: z.infer<typeof PersonIdentifierSchema>) => {
   const person = await prismaClient.person.findFirst({
     where: {
       id: Number(personId),
     },
-    include: {
-      events: true,
+    select: {
+      id: true,
+      firstName: true,
+      lastName: true,
+      nickName: true,
+      email: true,
+      phone: true,
+      events: {
+        select: {
+          id: true,
+          eventDate: true,
+          eventName: true,
+          isRecurring: true,
+        },
+      },
     },
   });
   return person;

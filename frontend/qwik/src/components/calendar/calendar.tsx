@@ -1,33 +1,50 @@
 import { $, component$, useComputed$, useSignal } from "@builder.io/qwik";
 import {
+  addDays,
   addMonths,
   endOfMonth,
   format,
+  getDate,
   getDay,
   getDaysInMonth,
+  isEqual,
+  isFuture,
+  isPast,
+  isToday,
   startOfMonth,
 } from "date-fns";
 import { BsArrowRightShort, BsArrowLeftShort } from "@qwikest/icons/bootstrap";
 
-import { CustomButton } from "../button/custom-button";
+import { OutlineButton } from "../button/outline-button";
 import { cn } from "~/lib/utils";
+import { useLocation } from "@builder.io/qwik-city";
 
-export const Calendar = component$(() => {
-  const displayedMonth = useSignal(new Date());
+interface CalendarProps {
+  upcomingDates: Array<string>;
+}
+
+export const Calendar = component$(({ upcomingDates }: CalendarProps) => {
+  const { params } = useLocation();
+  const selectedDate = params.date || new Date();
+  const displayedMonth = useSignal(selectedDate);
 
   const arrayOfDaysInMonth = useComputed$(() => {
-    const firstDay = getDay(startOfMonth(displayedMonth.value));
-    const lastDay = getDay(endOfMonth(displayedMonth.value));
+    const start = startOfMonth(displayedMonth.value);
+    const end = endOfMonth(displayedMonth.value);
+    const firstDay = getDay(start);
+    const lastDay = getDay(end);
     const nullBoxesInBeginning = firstDay;
     const nullBoxesInEnd = 6 - lastDay;
     const daysInMonth = getDaysInMonth(displayedMonth.value);
-    const datesArray: Array<number | boolean> = Array.from({
+    const datesArray: Array<Date | null> = Array.from({
       length: daysInMonth,
-    }).map((_, index) => index + 1);
+    }).map((_, index) => {
+      return addDays(startOfMonth(displayedMonth.value), index);
+    });
     datesArray.unshift(
-      ...Array.from({ length: nullBoxesInBeginning }).map(() => false)
+      ...Array.from({ length: nullBoxesInBeginning }).map(() => null),
     );
-    datesArray.push(...Array.from({ length: nullBoxesInEnd }).map(() => false));
+    datesArray.push(...Array.from({ length: nullBoxesInEnd }).map(() => null));
     return datesArray;
   });
 
@@ -36,19 +53,19 @@ export const Calendar = component$(() => {
   });
 
   return (
-    <>
-      <div class="flex items-center justify-center gap-x-2">
-        <CustomButton variant="outline" onClick$={() => handleMonthChange(-1)}>
+    <div class="flex-1 rounded-md bg-white p-2 lg:flex-initial">
+      <div class="flex items-center justify-center gap-x-2 pb-4">
+        <OutlineButton onClick$={() => handleMonthChange(-1)}>
           <BsArrowLeftShort />
-        </CustomButton>
+        </OutlineButton>
         <span class="w-[100px] text-center">
           {format(displayedMonth.value, "LLL yyyy")}
         </span>
-        <CustomButton variant="outline" onClick$={() => handleMonthChange(1)}>
+        <OutlineButton onClick$={() => handleMonthChange(1)}>
           <BsArrowRightShort />
-        </CustomButton>
+        </OutlineButton>
       </div>
-      <div class="grid grid-cols-7 justify-items-center gap-y-1 text-xs">
+      <div class="grid grid-cols-7 justify-items-center text-xs">
         <span class="font-bold">Su</span>
         <span class="font-bold">Mo</span>
         <span class="font-bold">Tu</span>
@@ -56,17 +73,57 @@ export const Calendar = component$(() => {
         <span class="font-bold">Th</span>
         <span class="font-bold">Fr</span>
         <span class="font-bold">Sa</span>
-        {arrayOfDaysInMonth.value.map((date, index) => (
-          <span
-            key={index}
-            class={cn("grid h-5 w-5 place-items-center rounded-sm", {
-              "bg-white": date,
-            })}
-          >
-            {date}
-          </span>
-        ))}
+        {arrayOfDaysInMonth.value.map((date, index) =>
+          date ? (
+            <CalendarDate
+              key={index}
+              date={date}
+              hasPastEvent={
+                upcomingDates.includes(format(date, "MM-dd")) && isPast(date)
+              }
+              hasUpcomingEvent={
+                upcomingDates.includes(format(date, "MM-dd")) && isFuture(date)
+              }
+            />
+          ) : (
+            <span key={index}></span>
+          ),
+        )}
       </div>
-    </>
+    </div>
   );
 });
+
+interface CalendarDateProps {
+  date: Date;
+  // isActive: boolean;
+  // completeTasksCount: number;
+  // totalTasksCount: number;
+  hasPastEvent: boolean;
+  hasUpcomingEvent: boolean;
+}
+
+export const CalendarDate = component$(
+  ({ date, hasPastEvent, hasUpcomingEvent }: CalendarDateProps) => {
+    const { params } = useLocation();
+    const selectedDate = params.date || new Date();
+    const formattedDate = format(date, "yyyy-MM-dd");
+
+    return (
+      <a
+        href={`/dashboard/${formattedDate}`}
+        class={cn(
+          "relative grid h-6 w-6 place-items-center rounded-full bg-white hover:bg-havelock-blue-300",
+          {
+            "bg-havelock-blue-300": isEqual(formattedDate, selectedDate),
+            "font-bold underline": isToday(date),
+            "border-2 border-havelock-blue-700": hasUpcomingEvent,
+            "border-2 border-slate-300": hasPastEvent,
+          },
+        )}
+      >
+        {getDate(date)}
+      </a>
+    );
+  },
+);

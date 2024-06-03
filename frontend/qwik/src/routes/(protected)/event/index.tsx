@@ -26,7 +26,7 @@ import { usePeopleLoader } from "../layout";
 export const useAddEvent = routeAction$(
   async (
     { eventName, eventDescription, eventDate, personId, ...optionals },
-    { request },
+    { request, headers },
   ) => {
     const stringifiedBody = JSON.stringify({
       eventName,
@@ -36,19 +36,24 @@ export const useAddEvent = routeAction$(
       isRecurring: optionals.isRecurring ? true : false,
     });
 
-    const headers = new Headers();
+    const requestHeaders = new Headers();
     for (const [key, value] of request.headers.entries()) {
       if (key !== "content-length" && key !== "content-type") {
-        headers.set(key, value);
+        requestHeaders.set(key, value);
       }
     }
-    headers.set("content-type", "application/json");
+    requestHeaders.set("content-type", "application/json");
 
     const res = await fetch(`${ENV.PUBLIC_API_URL}/event`, {
       method: "POST",
-      headers: headers,
+      headers: requestHeaders,
       body: stringifiedBody,
     });
+
+    for (const [key, value] of res.headers.entries()) {
+      headers.set(key, value);
+    }
+
     const { data } = await res.json();
     return { success: true, id: data.eventId };
   },

@@ -60,6 +60,11 @@ export const usePeopleLoader = routeLoader$<
         "Could not fetch friends, please refresh the page / try again later",
     });
   }
+
+  for (const [key, value] of res.headers.entries()) {
+    requestEvent.headers.set(key, value);
+  }
+
   const { data } = await res.json();
   try {
     GetPeopleSchema.parse(data.people);
@@ -93,6 +98,11 @@ export const useUpcomingEventsLoader = routeLoader$<
         "Could not fetch events, please refresh the page / try again later",
     });
   }
+
+  for (const [key, value] of res.headers.entries()) {
+    requestEvent.headers.set(key, value);
+  }
+
   const { data } = await res.json();
   try {
     UpcomingEventsSchema.parse(data.events);
@@ -124,6 +134,7 @@ export const useLogoutAction = routeAction$(
       method: "POST",
       headers: headers,
     });
+    
     for (const [key, value] of res.headers.entries()) {
       headers.set(key, value);
     }

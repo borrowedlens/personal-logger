@@ -8,7 +8,7 @@ import { PersonDetails } from "~/components/friends/friends";
 
 export const usePersonLoader = routeLoader$<
   BaseResponseSchema<z.infer<typeof PersonSchema>>
->(async ({ params, fail, request }) => {
+>(async ({ params, fail, request, headers }) => {
   const res = await fetch(`${ENV.PUBLIC_API_URL}/person/${params.friendId}`, {
     method: "GET",
     headers: request.headers,
@@ -22,6 +22,11 @@ export const usePersonLoader = routeLoader$<
         "Could not fetch person, please refresh the page / try again later",
     });
   }
+
+  for (const [key, value] of res.headers.entries()) {
+    headers.set(key, value);
+  }
+
   const { data } = await res.json();
   try {
     PersonSchema.parse(data.person);

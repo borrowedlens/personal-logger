@@ -24,7 +24,7 @@ export const SignupSchema = z
   })
   .refine(
     (values) => {
-      console.log("🚀 ~ values:", values)
+      console.log("🚀 ~ values:", values);
       return values.password === values.confirmPassword;
     },
     {
@@ -36,7 +36,7 @@ export const SignupSchema = z
 export const useSignup = routeAction$(
   async (
     { firstName, lastName, email, password, confirmPassword, dob, phone },
-    { fail },
+    { fail, headers },
   ) => {
     const stringifiedBody = JSON.stringify({
       firstName,
@@ -62,6 +62,11 @@ export const useSignup = routeAction$(
         data: null,
       });
     }
+
+    for (const [key, value] of res.headers.entries()) {
+      headers.set(key, value);
+    }
+
     const { data } = await res.json();
     return {
       success: true,
@@ -82,7 +87,7 @@ export default component$(() => {
 
   useTask$(({ track }) => {
     const id = track(() => action.value?.data?.id);
-    console.log("🚀 ~ id:", id)
+    console.log("🚀 ~ id:", id);
     if (id) {
       toast.success(
         "Account created successfully, please login with your credentials",

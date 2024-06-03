@@ -2,7 +2,7 @@ import { Slot, component$ } from "@builder.io/qwik";
 import { routeLoader$, z } from "@builder.io/qwik-city";
 import { AllEvents } from "~/components/events/events";
 import { ENV } from "~/lib/constants";
-import { BaseResponseSchema } from "~/models/Base";
+import type { BaseResponseSchema } from "~/models/Base";
 
 export const AllEventsSchema = z.array(
   z.object({
@@ -36,6 +36,11 @@ export const useAllEventsLoader = routeLoader$<
         "Could not fetch events, please refresh the page / try again later",
     });
   }
+
+  for (const [key, value] of res.headers.entries()) {
+    requestEvent.headers.set(key, value);
+  }
+
   const { data } = await res.json();
   try {
     AllEventsSchema.parse(data.events);

@@ -2,7 +2,7 @@ import { Slot, component$ } from "@builder.io/qwik";
 import { routeLoader$, z } from "@builder.io/qwik-city";
 import { AllEvents } from "~/components/events/events";
 import { ENV } from "~/lib/constants";
-import { BaseResponseSchema } from "~/models/Base";
+import type { BaseResponseSchema } from "~/models/Base";
 
 export const AllEventsSchema = z.array(
   z.object({

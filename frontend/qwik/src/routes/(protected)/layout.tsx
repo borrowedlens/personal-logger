@@ -93,6 +93,16 @@ export const useUpcomingEventsLoader = routeLoader$<
         "Could not fetch events, please refresh the page / try again later",
     });
   }
+
+  for (const [key, value] of res.headers.entries()) {
+    if (
+      key === "access-control-allow-origin" ||
+      key === "access-control-allow-credentials"
+    ) {
+      requestEvent.headers.set(key, value);
+    }
+  }
+
   const { data } = await res.json();
   try {
     UpcomingEventsSchema.parse(data.events);

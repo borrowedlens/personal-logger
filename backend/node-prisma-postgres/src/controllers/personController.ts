@@ -35,7 +35,8 @@ export const createPerson: RequestHandler = async (req, res, next) => {
 
 export const getPeople: RequestHandler = async (req, res, next) => {
   try {
-    const people = await getPeopleService();
+    const userId = req.session.user!;
+    const people = await getPeopleService({ userId });
     res.status(200).json({
       errorCode: 0,
       errorMessage: "",

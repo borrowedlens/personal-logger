@@ -5,6 +5,7 @@ import {
   UserSpecificPersonSchema,
 } from "../models/personModels";
 import { prismaClient } from "../app";
+import { UserSpecificSchema } from "../models/userModels";
 
 export const createPersonService = async ({
   firstName,
@@ -52,7 +53,9 @@ export const createPersonService = async ({
   return id;
 };
 
-export const getPeopleService = async () => {
+export const getPeopleService = async ({
+  userId,
+}: z.infer<typeof UserSpecificSchema>) => {
   const people = await prismaClient.person.findMany({
     select: {
       id: true,
@@ -68,6 +71,9 @@ export const getPeopleService = async () => {
           eventName: true,
         },
       },
+    },
+    where: {
+      userId,
     },
   });
   return people;

@@ -14,7 +14,10 @@ const app = express();
 app.use(
   cors({
     credentials: true,
-    origin: ["http://localhost:5173", "https://personal-logger.pages.dev"],
+    origin:
+      process.env.NODE_ENV === "production"
+        ? "https://personal-logger.pages.dev"
+        : "http://localhost:5173",
     methods: ["POST", "PUT", "GET", "OPTIONS", "HEAD", "PATCH", "DELETE"],
   })
 );

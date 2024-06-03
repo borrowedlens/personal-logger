@@ -11,10 +11,10 @@ import { SecondaryButton } from "~/components/button/secondary-button";
 import { EventInput } from "~/components/event-input/event-input";
 import { CustomInput } from "~/components/input/custom-input";
 import { SecondarySSRLink } from "~/components/ssr-links/secondary-ssr";
-import { PersonProfileSchema } from "~/models/Person";
 import { ENV } from "~/lib/constants";
+import { PersonProfileSchema } from "~/models/Person";
 
-export const useAddPerson = routeAction$(
+export const useAddPersonAction = routeAction$(
   async (
     { firstName, lastName, nickName, dob, phone, email, events },
     { request },
@@ -69,13 +69,15 @@ export default component$(() => {
 
   const additionalEventIds = useStore<Array<number>>([]);
 
-  const action = useAddPerson();
+  const action = useAddPersonAction();
 
   return (
-    <section class="flex h-full flex-col gap-y-4 rounded-lg bg-white text-slate-900">
-      <h2 class="md:text-lg">Add Friend</h2>
+    <section class="flex h-full flex-col gap-y-4 rounded-lg bg-white p-2 text-slate-900 lg:flex-1 lg:p-3">
+      <h2 class="md:text-lg" id="add-friend">
+        Add Friend
+      </h2>
       <Form
-        class="relative grid h-full content-start gap-y-2 overflow-y-auto px-2"
+        class="relative grid h-full content-start gap-y-6 overflow-y-auto px-2"
         action={action}
       >
         <fieldset class="flex flex-col gap-x-2 gap-y-2 sm:flex-row">
@@ -94,7 +96,7 @@ export default component$(() => {
             <CustomInput name="nickName"></CustomInput>
           </label>
           <label class="flex w-full flex-col gap-y-1 text-xs text-slate-800">
-            Date of Birth
+            Date of Birth - We'll add this as an event for you
             <CustomInput name="dob" type="date"></CustomInput>
           </label>
         </fieldset>
@@ -136,11 +138,11 @@ export default component$(() => {
               );
             }}
           >
-            ADD EVENT
+            Add Event
           </SecondaryButton>
         </fieldset>
         <fieldset class="sticky bottom-0 left-0 mt-2 flex items-center justify-between bg-white pt-2">
-          <SecondarySSRLink href={`/dashboard/event`}>Back</SecondarySSRLink>
+          <SecondarySSRLink href={`/event`}>Back</SecondarySSRLink>
           <PrimaryButton>Add Friend</PrimaryButton>
         </fieldset>
       </Form>

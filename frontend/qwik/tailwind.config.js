@@ -5,6 +5,7 @@ export default {
   theme: {
     fontFamily: {
       inter: "Inter",
+      poppins: "Poppins",
     },
     extend: {
       borderWidth: {

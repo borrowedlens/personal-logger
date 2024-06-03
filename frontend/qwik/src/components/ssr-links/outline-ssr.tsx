@@ -6,7 +6,7 @@ export const OutlineSSRLink = component$(
     return (
       <a
         class={cn(
-          "ring-offset-background focus-visible:ring-ring text-havelock-blue-700 transition-colors hover:text-havelock-blue-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
+          "ring-offset-background focus-visible:ring-ring rounded-md text-havelock-blue-700 transition-colors hover:bg-havelock-blue-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
           className,
         )}
         {...props}

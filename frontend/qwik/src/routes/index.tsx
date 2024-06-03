@@ -1,11 +1,7 @@
 import type { DocumentHead, RequestHandler } from "@builder.io/qwik-city";
 import { ENV } from "~/lib/constants";
 
-export const onGet: RequestHandler = async ({ request, cookie, redirect }) => {
-  const sessionCookie = cookie.get("connect.sid");
-  if (!sessionCookie) {
-    throw redirect(302, "/login");
-  }
+export const onGet: RequestHandler = async ({ request, redirect }) => {
   const res = await fetch(`${ENV.PUBLIC_API_URL}/auth`, {
     method: "GET",
     headers: request.headers,

@@ -5,63 +5,23 @@ import {
   useSignal,
   useTask$,
 } from "@builder.io/qwik";
-import {
-  Form,
-  routeAction$,
-  routeLoader$,
-  useNavigate,
-  z,
-  zod$,
-} from "@builder.io/qwik-city";
+import { Form, routeAction$, useNavigate, zod$ } from "@builder.io/qwik-city";
 import { toast } from "qwik-sonner";
 import { OutlineButton } from "~/components/button/outline-button";
 import { PrimaryButton } from "~/components/button/primary-button";
 import { CustomInput } from "~/components/input/custom-input";
 import { CustomSelect } from "~/components/select/custom-select";
 import { SecondarySSRLink } from "~/components/ssr-links/secondary-ssr";
-import { type BaseResponseSchema, PeopleSchema } from "~/models/Person";
 import { ENV } from "~/lib/constants";
 import { setSearchParam } from "~/lib/utils";
 import { AddEventSchema } from "~/models/Event";
-// import { OutlineSSR } from "~/components/ssr-links/outline-ssr";
-
-export const usePeople = routeLoader$<
-  BaseResponseSchema<z.infer<typeof PeopleSchema>>
->(async (requestEvent) => {
-  const res = await fetch(`${ENV.PUBLIC_API_URL}/people`, {
-    method: "GET",
-  });
-  if (!res.ok) {
-    return requestEvent.fail(res.status, {
-      data: [],
-      errorCode: res.status,
-      success: false,
-      errorMessage:
-        "Could not fetch people, please refresh the page / try again later",
-    });
-  }
-  const { data } = await res.json();
-  try {
-    PeopleSchema.parse(data.people);
-  } catch (err) {
-    if (err instanceof z.ZodError) {
-      return requestEvent.fail(409, {
-        data: [],
-        errorCode: res.status,
-        success: false,
-        errorMessage: err.message,
-      });
-    }
-  }
-  return { errorMessage: "", errorCode: 0, success: true, data: data.people };
-});
+import { usePeopleLoader } from "../layout";
 
 export const useAddEvent = routeAction$(
   async (
     { eventName, eventDescription, eventDate, personId, ...optionals },
     { request },
   ) => {
-    console.log("🚀 ~ eventDate:", eventDate)
     const stringifiedBody = JSON.stringify({
       eventName,
       eventDescription,
@@ -88,7 +48,7 @@ export const useAddEvent = routeAction$(
 export default component$(() => {
   const formRef = useSignal<HTMLFormElement>();
 
-  const people = usePeople();
+  const people = usePeopleLoader();
   const peopleOptions = useComputed$(() =>
     people.value.data?.map((person) => ({
       label: person.nickName || `${person.firstName} ${person.lastName}`,
@@ -104,13 +64,13 @@ export default component$(() => {
     const id = track(() => action.value?.id);
     if (id) {
       toast.success("Event has been added");
-      navigate(`/dashboard/event/${id}`);
+      navigate(`/event/${id}`);
     }
   });
 
   const handleNavigation = $(() => {
     const currentFormData = new FormData(formRef.value);
-    const navigationUrl = new URL(`${ENV.PUBLIC_UI_URL}/dashboard/person`);
+    const navigationUrl = new URL(`${ENV.PUBLIC_UI_URL}/person`);
     setSearchParam(navigationUrl, currentFormData, "eventName");
     setSearchParam(navigationUrl, currentFormData, "eventDate");
     setSearchParam(navigationUrl, currentFormData, "isRecurring");
@@ -119,7 +79,10 @@ export default component$(() => {
   });
 
   return (
-    <>
+    <section
+      class="flex h-full flex-col gap-y-4 rounded-lg bg-white p-2 text-slate-900 lg:flex-1 lg:p-3"
+      style={{ scrollSnapType: "x mandatory" }}
+    >
       <h2 class="md:text-lg">Add an event</h2>
       <Form class="grid gap-y-2" action={action} ref={formRef}>
         <fieldset class="flex flex-col items-start gap-x-2 sm:flex-row">
@@ -190,6 +153,6 @@ export default component$(() => {
           <PrimaryButton>Add Event</PrimaryButton>
         </fieldset>
       </Form>
-    </>
+    </section>
   );
 });

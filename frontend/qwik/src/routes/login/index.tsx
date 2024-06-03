@@ -12,7 +12,7 @@ export const LoginSchema = z.object({
     .min(8, { message: "Password must be at least 8 characters" }),
 });
 
-export const useLogin = routeAction$(
+export const useLoginAction = routeAction$(
   async (user, { fail, headers, redirect }) => {
     const res = await fetch(`${ENV.PUBLIC_API_URL}/login`, {
       method: "POST",
@@ -42,7 +42,7 @@ export const useLogin = routeAction$(
 );
 
 export default component$(() => {
-  const action = useLogin();
+  const action = useLoginAction();
   return (
     <main class="grid h-full w-full place-items-center bg-app-login-radial from-havelock-blue-300 from-20% to-40% lg:p-16">
       <section class="grid min-h-[80%] max-w-[80%] place-items-center rounded-lg bg-white p-6 text-slate-900 lg:grid-cols-[60%_auto]">

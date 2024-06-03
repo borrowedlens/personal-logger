@@ -2,18 +2,20 @@ import { RequestHandler } from "express";
 import {
   addEventService,
   getEventDetailsService,
-  getEventsService,
+  getUpcomingEventsService,
+  updateEventService,
 } from "../services/eventService";
-import { EventSpecificSchema, EventSchema } from "../models/eventModels";
+import {
+  EventSpecificSchema,
+  EventSchema,
+  UpdateEventSchema,
+} from "../models/eventModels";
 import { ErrorStatusCodes, GlobalError } from "../middleware/errorMiddleware";
 
-export const getEvents: RequestHandler = async (req, res, next) => {
+export const getUpcomingEvents: RequestHandler = async (req, res, next) => {
   try {
-    if (!req.session.user) {
-      throw new GlobalError("Session expired", ErrorStatusCodes.UNAUTHORIZED);
-    }
-    const userId = req.session.user;
-    const events = await getEventsService({ userId });
+    const userId = req.session.user!;
+    const events = await getUpcomingEventsService({ userId });
     res.status(200).json({
       errorCode: 0,
       errorMessage: "",
@@ -29,10 +31,7 @@ export const getEvents: RequestHandler = async (req, res, next) => {
 
 export const getEventDetails: RequestHandler = async (req, res, next) => {
   try {
-    if (!req.session.user) {
-      throw new GlobalError("Session expired", ErrorStatusCodes.UNAUTHORIZED);
-    }
-    const userId = req.session.user;
+    const userId = req.session.user!;
     const { eventId } = EventSpecificSchema.parse(req.params);
     const event = await getEventDetailsService({ eventId, userId });
     if (!event) {
@@ -49,12 +48,9 @@ export const getEventDetails: RequestHandler = async (req, res, next) => {
   }
 };
 
-export const addEvent: RequestHandler = async (req, res, next) => {
+export const createEvent: RequestHandler = async (req, res, next) => {
   try {
-    if (!req.session.user) {
-      throw new GlobalError("Session expired", ErrorStatusCodes.UNAUTHORIZED);
-    }
-    const userId = req.session.user;
+    const userId = req.session.user!;
     const { eventName, eventDate, eventDescription, isRecurring, personId } =
       EventSchema.parse(req.body);
     const eventId = await addEventService({
@@ -69,6 +65,29 @@ export const addEvent: RequestHandler = async (req, res, next) => {
       success: true,
       data: {
         eventId,
+      },
+      errorCode: 0,
+      errorMessage: "",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateEvent: RequestHandler = async (req, res, next) => {
+  try {
+    const userId = req.session.user!;
+    const eventId = req.params.eventId;
+    const eventDetails = UpdateEventSchema.parse(req.body);
+    const updatedEventId = await updateEventService({
+      userId,
+      eventId,
+      ...eventDetails,
+    });
+    res.status(200).json({
+      success: true,
+      data: {
+        eventId: updatedEventId,
       },
       errorCode: 0,
       errorMessage: "",

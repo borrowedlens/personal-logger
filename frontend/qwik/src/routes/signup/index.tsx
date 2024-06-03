@@ -7,7 +7,6 @@ import {
   zod$,
 } from "@builder.io/qwik-city";
 import { PrimaryButton } from "~/components/button/primary-button";
-import { Header } from "~/components/header/header";
 import { CustomInput } from "~/components/input/custom-input";
 import { SecondarySSRLink } from "~/components/ssr-links/secondary-ssr";
 import { ENV } from "~/lib/constants";
@@ -18,13 +17,14 @@ export const SignupSchema = z
     firstName: z.string(),
     lastName: z.string(),
     email: z.string().email(),
-    phone: z.string().length(10).optional(),
+    phone: z.union([z.string().length(0), z.string().length(10)]),
     password: z.string().min(8),
     confirmPassword: z.string().min(8),
     dob: z.string(),
   })
   .refine(
     (values) => {
+      console.log("🚀 ~ values:", values)
       return values.password === values.confirmPassword;
     },
     {
@@ -57,7 +57,7 @@ export const useSignup = routeAction$(
     if (!res.ok) {
       return fail(res.status, {
         success: false,
-        errorCode: 500,
+        errorCode: res.status,
         errorMessage: "Something went wrong",
         data: null,
       });
@@ -82,6 +82,7 @@ export default component$(() => {
 
   useTask$(({ track }) => {
     const id = track(() => action.value?.data?.id);
+    console.log("🚀 ~ id:", id)
     if (id) {
       toast.success(
         "Account created successfully, please login with your credentials",
@@ -92,8 +93,7 @@ export default component$(() => {
 
   return (
     <>
-      <Header />
-      <main class="grid h-full w-full place-items-center md:px-12 md:py-4">
+      <main class="grid h-full w-full place-items-center bg-app-login-radial from-havelock-blue-300 from-20% to-40% md:px-12 md:py-4">
         <section class="flex flex-col gap-y-6 rounded-lg bg-white text-slate-900 md:px-12 md:py-10 lg:max-w-[50%]">
           <h2 class="text-3xl">Let's get you started!</h2>
           <Form class="grid gap-y-5" action={action}>
@@ -118,7 +118,7 @@ export default component$(() => {
               </label>
             </fieldset>
             <label class="flex w-full flex-col gap-y-1 text-xs text-slate-800">
-              Date of Birth*
+              Date of Birth* - This will be your first event
               <CustomInput name="dob" type="date"></CustomInput>
               {action.value?.failed && (
                 <span class="text-burnt-umber-700">

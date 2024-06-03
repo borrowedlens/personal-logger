@@ -1,19 +1,21 @@
 import { z } from "zod";
 import { prismaClient } from "../app";
 import {
-  EventDetailsSchema,
   EventSpecificSchema,
   UserSpecificEventSchema,
+  UserSpecificUpdateEventSchema,
 } from "../models/eventModels";
 import { UserSpecificSchema } from "../models/userModels";
 
-export const getEventsService = async ({
+export const getUpcomingEventsService = async ({
   userId,
 }: z.infer<typeof UserSpecificSchema>) => {
   const events = await prismaClient.$queryRaw`
     SELECT *
     FROM
-        (SELECT events.*,
+        (SELECT events."eventName",
+                events."id",
+                events."userId",
                 people."firstName",
                 people."lastName",
                 people."nickName",
@@ -44,23 +46,37 @@ export const getEventDetailsService = async ({
         userId: userId,
       },
     },
+    include: {
+      person: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          nickName: true,
+        },
+      },
+    },
   });
   return event;
 };
 
 export const updateEventService = async ({
+  userId,
   eventId,
   ...event
-}: z.infer<typeof EventDetailsSchema>) => {
+}: z.infer<typeof UserSpecificUpdateEventSchema>) => {
   const updateResults = await prismaClient.event.update({
     where: {
-      id: eventId,
+      id: +eventId,
+      AND: {
+        userId: userId,
+      },
     },
     data: {
       ...event,
     },
   });
-  return updateResults;
+  return updateResults.id;
 };
 
 export const addEventService = async ({

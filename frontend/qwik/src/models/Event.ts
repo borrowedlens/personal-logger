@@ -3,12 +3,8 @@ import { z } from "@builder.io/qwik-city";
 export const UpcomingEventResponseSchema = z.object({
   id: z.number(),
   eventName: z.string().min(1),
-  eventDescription: z.string().min(1),
-  eventDate: z.coerce.date(),
-  isRecurring: z.coerce.boolean(),
-  personId: z.coerce.number({ message: "Please select a friend" }),
-  userId: z.number().nullable(),
-  upcomingDate: z.coerce.date(),
+  eventDate: z.coerce.date().optional(),
+  upcomingDate: z.coerce.date().optional(),
   nickName: z.string().nullable(), // would be null in case the event belongs to the logged in user
   firstName: z.string().nullable(), // would be null in case the event belongs to the logged in user
   lastName: z.string().nullable(), // would be null in case the event belongs to the logged in user

@@ -17,7 +17,7 @@ import { PersonProfileSchema } from "~/models/Person";
 export const useAddPersonAction = routeAction$(
   async (
     { firstName, lastName, nickName, dob, phone, email, events },
-    { request, headers },
+    { request },
   ) => {
     const reqBody: z.infer<typeof PersonProfileSchema> = {
       firstName,
@@ -41,26 +41,21 @@ export const useAddPersonAction = routeAction$(
     }
     const stringifiedBody = JSON.stringify(reqBody);
 
-    const requestHeaders = new Headers();
+    const headers = new Headers();
     for (const [key, value] of request.headers.entries()) {
       if (key !== "content-length" && key !== "content-type") {
-        requestHeaders.set(key, value);
+        headers.set(key, value);
       }
     }
-    requestHeaders.set("content-type", "application/json");
+    headers.set("content-type", "application/json");
 
     const res = await fetch(`${ENV.PUBLIC_API_URL}/person`, {
       method: "POST",
-      headers: requestHeaders,
+      headers: headers,
       body: stringifiedBody,
     });
-
-    for (const [key, value] of res.headers.entries()) {
-      headers.set(key, value);
-    }
-
-    const { data } = await res.json();
-    return { success: true, id: data.personId };
+    const data = await res.json();
+    return { success: true, id: data.data.personId };
   },
   zod$(PersonProfileSchema),
 );

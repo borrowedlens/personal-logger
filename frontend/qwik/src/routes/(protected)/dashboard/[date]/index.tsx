@@ -26,7 +26,7 @@ import type { BaseResponseSchema } from "~/models/Base";
 
 export const useDayTasksLoader = routeLoader$<
   BaseResponseSchema<z.infer<typeof TasksSchema>>
->(async ({ params, request, fail, headers }) => {
+>(async ({ params, request, fail }) => {
   const date = params.date;
   const res = await fetch(`${ENV.PUBLIC_API_URL}/tasks?date=${date}`, {
     method: "GET",
@@ -41,11 +41,6 @@ export const useDayTasksLoader = routeLoader$<
         "Could not fetch tasks, please refresh the page / try again later",
     });
   }
-
-  for (const [key, value] of res.headers.entries()) {
-    headers.set(key, value);
-  }
-
   const { data } = await res.json();
   try {
     TasksSchema.parse(data.tasks);
@@ -65,7 +60,7 @@ export const useDayTasksLoader = routeLoader$<
 
 export const useBacklogTasksLoader = routeLoader$<
   BaseResponseSchema<z.infer<typeof TasksSchema>>
->(async ({ request, fail, headers }) => {
+>(async ({ request, fail }) => {
   const res = await fetch(`${ENV.PUBLIC_API_URL}/tasks`, {
     method: "GET",
     headers: request.headers,
@@ -79,11 +74,6 @@ export const useBacklogTasksLoader = routeLoader$<
         "Could not fetch tasks, please refresh the page / try again later",
     });
   }
-
-  for (const [key, value] of res.headers.entries()) {
-    headers.set(key, value);
-  }
-
   const { data } = await res.json();
   try {
     TasksSchema.parse(data.tasks);
@@ -102,24 +92,24 @@ export const useBacklogTasksLoader = routeLoader$<
 });
 
 export const useCreateTaskAction = routeAction$(
-  async ({ date }, { request, fail, headers }) => {
+  async ({ date }, { request, fail }) => {
     const stringifiedBody = JSON.stringify({
       name: "",
       date: date,
     });
 
-    const requestHeaders = new Headers();
+    const headers = new Headers();
     for (const [key, value] of request.headers.entries()) {
       if (key !== "content-length" && key !== "content-type") {
-        requestHeaders.set(key, value);
+        headers.set(key, value);
       }
     }
-    requestHeaders.set("content-type", "application/json");
+    headers.set("content-type", "application/json");
 
     const res = await fetch(`${ENV.PUBLIC_API_URL}/task`, {
       method: "POST",
       body: stringifiedBody,
-      headers: requestHeaders,
+      headers: headers,
     });
     if (!res.ok) {
       return fail(res.status, {
@@ -129,11 +119,6 @@ export const useCreateTaskAction = routeAction$(
         errorMessage: "Could not create task",
       });
     }
-
-    for (const [key, value] of res.headers.entries()) {
-      headers.set(key, value);
-    }
-
     const { data } = await res.json();
     return {
       success: true,
@@ -153,7 +138,7 @@ const UpdateTaskSchema = z.object({
 });
 
 export const useUpdateTaskAction = routeAction$(
-  async ({ id, date, name, complete }, { request, fail, headers }) => {
+  async ({ id, date, name, complete }, { request, fail }) => {
     const stringifiedBody = JSON.stringify({
       id,
       name,
@@ -161,18 +146,18 @@ export const useUpdateTaskAction = routeAction$(
       complete,
     });
 
-    const requestHeaders = new Headers();
+    const headers = new Headers();
     for (const [key, value] of request.headers.entries()) {
       if (key !== "content-length" && key !== "content-type") {
-        requestHeaders.set(key, value);
+        headers.set(key, value);
       }
     }
-    requestHeaders.set("content-type", "application/json");
+    headers.set("content-type", "application/json");
 
     const res = await fetch(`${ENV.PUBLIC_API_URL}/task`, {
       method: "PATCH",
       body: stringifiedBody,
-      headers: requestHeaders,
+      headers: headers,
     });
     if (!res.ok) {
       return fail(res.status, {
@@ -182,11 +167,6 @@ export const useUpdateTaskAction = routeAction$(
         errorMessage: "Could not update task",
       });
     }
-
-    for (const [key, value] of res.headers.entries()) {
-      headers.set(key, value);
-    }
-
     const { data } = await res.json();
     return {
       success: true,
@@ -203,18 +183,18 @@ const DeleteTaskSchema = z.object({
 });
 
 export const useDeleteTaskAction = routeAction$(
-  async ({ id }, { request, fail, headers }) => {
-    const requestHeaders = new Headers();
+  async ({ id }, { request, fail }) => {
+    const headers = new Headers();
     for (const [key, value] of request.headers.entries()) {
       if (key !== "content-length" && key !== "content-type") {
-        requestHeaders.set(key, value);
+        headers.set(key, value);
       }
     }
-    requestHeaders.set("content-type", "application/json");
+    headers.set("content-type", "application/json");
 
     const res = await fetch(`${ENV.PUBLIC_API_URL}/task/${id}`, {
       method: "DELETE",
-      headers: requestHeaders,
+      headers: headers,
     });
     if (!res.ok) {
       return fail(res.status, {
@@ -224,11 +204,6 @@ export const useDeleteTaskAction = routeAction$(
         errorMessage: "Could not delete task",
       });
     }
-
-    for (const [key, value] of res.headers.entries()) {
-      headers.set(key, value);
-    }
-
     const { data } = await res.json();
     return {
       success: true,

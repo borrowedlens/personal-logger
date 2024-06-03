@@ -38,11 +38,6 @@ export const useEventDetailsLoader = routeLoader$<
         "Could not fetch the event details, please refresh the page / try again later",
     });
   }
-
-  for (const [key, value] of res.headers.entries()) {
-    requestEvent.headers.set(key, value);
-  }
-
   const { data } = await res.json();
   try {
     EventDetailSchema.parse(data.event);
@@ -62,7 +57,7 @@ export const useEventDetailsLoader = routeLoader$<
 export const useUpdateEventAction = routeAction$(
   async (
     { eventName, eventDescription, eventDate, ...optionals },
-    { request, params, headers },
+    { request, params },
   ) => {
     const eventId = params.eventId || "";
     const stringifiedBody = JSON.stringify({
@@ -72,24 +67,19 @@ export const useUpdateEventAction = routeAction$(
       isRecurring: optionals.isRecurring ? true : false,
     });
 
-    const requestHeaders = new Headers();
+    const headers = new Headers();
     for (const [key, value] of request.headers.entries()) {
       if (key !== "content-length" && key !== "content-type") {
-        requestHeaders.set(key, value);
+        headers.set(key, value);
       }
     }
-    requestHeaders.set("content-type", "application/json");
+    headers.set("content-type", "application/json");
 
     const res = await fetch(`${ENV.PUBLIC_API_URL}/event/${eventId}`, {
       method: "PATCH",
-      headers: requestHeaders,
+      headers: headers,
       body: stringifiedBody,
     });
-
-    for (const [key, value] of res.headers.entries()) {
-      headers.set(key, value);
-    }
-
     const { data } = await res.json();
     return {
       success: true,
